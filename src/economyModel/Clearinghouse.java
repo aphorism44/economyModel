@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.OptionalDouble;
 
 public class Clearinghouse {
 
@@ -19,7 +20,7 @@ public class Clearinghouse {
 		this.askBook = new ArrayList<Offer>();
 		this.turnNumber = 1;
 	}
-	/*
+	
 	public void createBid(Agent a, int type, String comm, int limit) {
 		double bid = this.priceOf(comm);
 		int idealAmount = this.determineQuantity(a, comm);
@@ -39,18 +40,23 @@ public class Clearinghouse {
 	}
 	
 	public int determineQuantity(Agent a, String comm) {
-		double mean = this.getHistoricalPrice(comm);
+		double mean = this.getHistoricalPriceMean(comm);
+		int excessInventory = a.getExcessInventory();
+		
 		
 		
 		return 0;
 	}
 	
 	public double getHistoricalPriceMean(String c) {
-		//let's hear it for lambda
-		ArrayList<Offer> commodityOffers = this.historicalRecords.stream().filter(o->o.getCommodityType().equals(comm).toArray(Offer[]::new));
-		return commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
+		//let's hear it for lambda!
+		ArrayList<Offer> commodityOffers = (ArrayList<Offer>) this.historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
+		OptionalDouble avg = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
+		if (avg.isPresent())
+			return avg.getAsDouble();
+		return 0;
 	}
-	*/
+	
 	
 	public void resolveOffers(String commodity, LinkedHashMap<UUID, Agent> agents ) {
 		//grab all bids for inputed commodity;

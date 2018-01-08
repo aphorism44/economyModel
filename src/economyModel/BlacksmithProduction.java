@@ -1,8 +1,23 @@
 package economyModel;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 public class BlacksmithProduction implements ProductionBehavior {
+	
+	private static ArrayList<String> producedCommodities;
+	static {
+		producedCommodities = new ArrayList<String>();
+		producedCommodities.add("tools");
+	}
+	private static ArrayList<String> consumedCommodities;
+	static {
+		consumedCommodities = new ArrayList<String>();
+		consumedCommodities.add("food");
+		consumedCommodities.add("metal");
+	}
+	
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
 		int metal = (int)inventory.get("metal");
@@ -24,6 +39,14 @@ public class BlacksmithProduction implements ProductionBehavior {
 		inventory.put("money", money);
 		
 		return inventory;
+	}
+	
+	public ArrayList<String> getProducedCommodities() {
+		return this.producedCommodities;
+	}
+	
+	public ArrayList<String> getConsumedCommodities() {
+		return this.consumedCommodities;
 	}
 
 }
