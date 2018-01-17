@@ -44,7 +44,7 @@ public class Offer {
 		return this.agentId;
 	}
 	
-	public void acceptOffer(int n) {
+	public void acceptOffer() {
 		this.offerAccepted = true;
 	}
 	
@@ -57,5 +57,8 @@ public class Offer {
 		this.quantity += n;
 	}
 	
+	public boolean getOfferAccepted() {
+		return this.offerAccepted;
+	}
 	
 }

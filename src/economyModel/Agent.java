@@ -42,6 +42,47 @@ public class Agent {
 		return this.inventory.get(commmodity);
 	}
 	
+	public int getExcessInventory(String commodity) {
+		//get the count of matching produced items
+		int excess = 0;
+		if (this.producedItems.contains(commodity))
+			excess = this.inventory.get(commodity);
+		
+		return excess;
+	}
+	
+	public int getExcessSpace(String commodity) {
+		//find out how much space is left for needed commodity
+		int amount = 0, space = 0;
+		if (this.consumedItems.contains(commodity)) {
+			amount = this.inventory.get(commodity);
+			space = this.inventorySize - amount;
+		}
+		
+		return space;
+	}
+	
+	public double getPriceBelief(String commodity) {
+		double guessedBid = 0;
+		//grab a random number within the price belief bounds
+		if (this.priceBeliefs.containsKey(commodity))
+			guessedBid = this.priceBeliefs.get(commodity).getRandomBid();
+		
+		return guessedBid;
+	}
+	
+	//should return number between 0.0 and 1.0
+	public double getCommodityFavorability(String commodity, double marketMean) {
+		double favorability = 0.0;
+		
+		if (this.priceBeliefs.containsKey(commodity))
+			favorability = this.priceBeliefs.get(commodity).getRangePenetration(marketMean);
+		
+		return favorability;
+		
+	}
+	
+	
 	//n will be positive for buyers and negative for sellers
 	public void updateInventory(String c, int n) {
 		int inv = this.inventory.get(c);
@@ -52,6 +93,27 @@ public class Agent {
 	
 	public void updateMoney(double n) {
 		this.money += n;
+	}
+	
+	//update price belief
+	public void updatePriceBelief(Offer o) {
+		String comm = o.getCommodityType();
+		PriceBelief relevantBelief = this.priceBeliefs.get(comm);
+		if (o.getOfferAccepted()) {
+			relevantBelief.contractBounds();
+		} else {
+			//if they tried to purchase a required
+			//consumed commodity and failed, there
+			//will be a _drastic_ belief adjustment
+		}
+		
+		this.priceBeliefs.put(comm, relevantBelief);
+	}
+	
+	public String toString() {
+		StringBuilder out = new StringBuilder();
+		
+		return out.toString();
 	}
 	
 	

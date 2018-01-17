@@ -22,13 +22,11 @@ public class Clearinghouse {
 	}
 	
 	public void createBid(Agent a, int type, String comm, int limit) {
-		double bid = this.priceOf(comm);
-		int idealAmount = this.determineQuantity(a, comm);
+		double bid = a.getPriceBelief(comm);
+		int idealAmount = this.determineQuantity(a, comm, type);
 		int quant = Math.min(idealAmount, limit);
-		
-		
-		
-		Offer newBid = new Offer(a.getUuid(), type, comm, quant, bid);
+				
+		Offer newBid = new Offer(a.getUuid(), type, comm, quant, bid, this.turnNumber);
 		switch(type) {
 			case 0:
 				this.bidBook.add(newBid);
@@ -39,13 +37,19 @@ public class Clearinghouse {
 		}
 	}
 	
-	public int determineQuantity(Agent a, String comm) {
+	public int determineQuantity(Agent a, String comm, int type) {
 		double mean = this.getHistoricalPriceMean(comm);
-		int excessInventory = a.getExcessInventory();
+		int excessInventory = a.getExcessInventory(comm);
+		double favorability = a.getCommodityFavorability(comm, mean);
+		int availableSpace = a.getExcessSpace(comm);
 		
-		
-		
-		return 0;
+		//bid or ask
+		if (type == 0)
+			return (int)Math.floor(favorability * excessInventory);
+		else if (type == 1)
+			return (int)Math.floor(favorability * availableSpace);
+		else
+			return 0;
 	}
 	
 	public double getHistoricalPriceMean(String c) {
@@ -96,17 +100,23 @@ public class Clearinghouse {
 				bid.updateQuantity(-tradeQuantity);
 				ask.updateQuantity(-tradeQuantity);
 				
-				if (bid.getQuantity() < 1)
-					bids.remove(0);
-				if (ask.getQuantity() < 1)
-					asks.remove(0);
+				if (bid.getQuantity() < 1) {
+					bid.acceptOffer();
+					
+					
+					this.historicalRecords.add(bids.remove(0));
+				}
 				
-				//TODO - update the historical record; update Agent price belief (?)
+				if (ask.getQuantity() < 1) {
+					ask.acceptOffer();
+					this.historicalRecords.add(asks.remove(0));
+				}
 				
 			}
 			
 			
 		}
+		//negatively change price beliefs for remaining offers
 		
 		
 	}
