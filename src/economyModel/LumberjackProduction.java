@@ -17,9 +17,9 @@ public class LumberjackProduction implements ProductionBehavior {
 	}
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
-		int wood = (int)inventory.get("wood");
-		int food = (int)inventory.get("food");
-		int money = (int)inventory.get("money");
+		int wood = inventory.containsKey("wood") ? (int)inventory.get("wood") : 0;
+		int food = inventory.containsKey("food") ? (int)inventory.get("food") : 0;;
+		int taxes = 0;
 		
 		if (hasTools && food > 0) {
 			wood += 2;
@@ -28,12 +28,12 @@ public class LumberjackProduction implements ProductionBehavior {
 			wood += 1;
 			food -=1;
 		} else {
-			money -= 2;
+			taxes -= 2;
 		}
 		
 		inventory.put("wood", wood);
 		inventory.put("food", food);
-		inventory.put("money", money);
+		inventory.put("taxMoney", taxes);
 		
 		return inventory;
 	}

@@ -4,15 +4,16 @@ import java.util.UUID;
 
 public class Offer {
 	
-	private int offerType; //0 = bid, 1 = ask
+	private String offerType; //bid or ask
 	private String commodityType;
 	private UUID agentId; //either the seller or the buyer
 	private int quantity; //bid = amount offered; ask = amount desired
 	private int turnNumber; //keep track of when offer was made
 	private double offer;
 	private boolean offerAccepted;
+	private String creatorAgentType;
 	
-	public Offer(UUID aId, int type, String commodity, int quant, double bid, int turnNo) {
+	public Offer(UUID aId, String type, String commodity, int quant, double bid, int turnNo, String agentType) {
 		this.offerType = type;
 		this.commodityType = commodity.toLowerCase();
 		this.quantity = quant;
@@ -20,6 +21,7 @@ public class Offer {
 		this.offerAccepted = false;
 		this.agentId = aId;
 		this.turnNumber = turnNo;
+		this.creatorAgentType = agentType;
 	}
 	
 	public boolean isOfCommodity(String c) {
@@ -34,6 +36,10 @@ public class Offer {
 	
 	public String getCommodityType() {
 		return this.commodityType;
+	}
+	
+	public String getCreatorAgentType() {
+		return this.creatorAgentType;
 	}
 	
 	public double getOffer() {
@@ -59,6 +65,18 @@ public class Offer {
 	
 	public boolean getOfferAccepted() {
 		return this.offerAccepted;
+	}
+	
+	public String toString() {
+		StringBuffer s = new StringBuffer();
+		s.append("offerType: " + this.offerType);
+		s.append(", commodity: " + this.commodityType);
+		s.append(", quantity: " + this.quantity);
+		s.append(", price: " + this.offer);
+		s.append(", agentType: " + this.creatorAgentType);
+		s.append(", agentId: " + this.agentId + "\n");
+		
+		return s.toString();
 	}
 	
 }

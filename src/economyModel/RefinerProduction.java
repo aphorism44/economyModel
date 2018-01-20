@@ -18,10 +18,12 @@ public class RefinerProduction implements ProductionBehavior {
 	}
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
-		int ore = (int)inventory.get("ore");
-		int metal = (int)inventory.get("metal");
-		int food = (int)inventory.get("food");
-		int money = (int)inventory.get("money");
+		
+		int ore = inventory.containsKey("ore") ? (int)inventory.get("ore") : 0;
+		int metal = inventory.containsKey("metal") ? (int)inventory.get("metal") : 0;
+		int food = inventory.containsKey("food") ? (int)inventory.get("food") : 0;;
+		int taxes =  0;
+		
 		
 		if (hasTools && food > 0) {
 			metal += ore;
@@ -32,13 +34,13 @@ public class RefinerProduction implements ProductionBehavior {
 			metal += oreUsed;
 			ore -= oreUsed;
 		} else {
-			money -= 2;
+			taxes -= 2;
 		}
 		
 		inventory.put("ore", ore);
 		inventory.put("metal", metal);
 		inventory.put("food", food);
-		inventory.put("money", money);
+		inventory.put("taxMoney", taxes);
 		
 		return inventory;
 	}

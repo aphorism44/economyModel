@@ -17,9 +17,11 @@ public class FarmerProduction implements ProductionBehavior {
 	}
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
-		int wood = (int)inventory.get("wood");
-		int food = (int)inventory.get("food");
-		int money = (int)inventory.get("money");
+		
+		
+		int wood = inventory.containsKey("wood") ? (int)inventory.get("wood") : 0;
+		int food = inventory.containsKey("food") ? (int)inventory.get("food") : 0;;
+		int taxes = 0;
 		
 		if (hasTools && wood > 0) {
 			food += 4;
@@ -28,12 +30,14 @@ public class FarmerProduction implements ProductionBehavior {
 			food += 2;
 			wood -=1;
 		} else {
-			money -= 2;
+			taxes += 2;
 		}
+		
+		//NOTE - we place money here, but it would only convay the need for a fine.
 		
 		inventory.put("wood", wood);
 		inventory.put("food", food);
-		inventory.put("money", money);
+		inventory.put("taxMoney", taxes);
 		
 		return inventory;
 	}

@@ -20,23 +20,24 @@ public class BlacksmithProduction implements ProductionBehavior {
 	
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
-		int metal = (int)inventory.get("metal");
-		int tools = (int)inventory.get("tools");
-		int food = (int)inventory.get("food");
-		int money = (int)inventory.get("money");
+		
+		int metal = inventory.containsKey("metal") ? (int)inventory.get("metal") : 0;
+		int tools = inventory.containsKey("tools") ? (int)inventory.get("tools") : 0;;
+		int food = inventory.containsKey("food") ? (int)inventory.get("food") : 0;
+		int taxes = 0;
 		
 		if (food > 0) {
 			tools += metal;
 			metal = 0;
 			food -= 1;
 		} else {
-			money -= 2;
+			taxes -= 2;
 		}
 		
 		inventory.put("metal", metal);
 		inventory.put("tools", tools);
 		inventory.put("food", food);
-		inventory.put("money", money);
+		inventory.put("taxMoney", taxes);
 		
 		return inventory;
 	}

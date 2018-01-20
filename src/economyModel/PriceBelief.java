@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class PriceBelief {
 	
+	private static final double initialLowePriceBound = 1;
+	private static final double initialHighPriceBound = 50;
+	
 	private String commodity;
 	private double lowerPriceBound;
 	private double upperPriceBound;
@@ -12,13 +15,22 @@ public class PriceBelief {
 	
 	public PriceBelief(String c) {
 		this.commodity = c;
-		this.lowerPriceBound = 0;
-		this.upperPriceBound = 0;
-		
+		this.lowerPriceBound = this.initialLowePriceBound;
+		this.upperPriceBound = this.initialHighPriceBound;
+	}
+	
+	public PriceBelief(String c, double low, double high) {
+		this.commodity = c;
+		this.lowerPriceBound = low;
+		this.upperPriceBound = high;
 	}
 	
 	//returns percentage for "favorability" measure
 	public double getRangePenetration(double mean) {
+		//if there's no market data, make the mean a random number between bounds
+		if (mean == 0)
+			mean = this.getRandomBid();
+		
 		return (mean - this.lowerPriceBound) / (this.upperPriceBound - this.lowerPriceBound);
 	}
 	

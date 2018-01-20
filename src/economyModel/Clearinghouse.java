@@ -21,43 +21,78 @@ public class Clearinghouse {
 		this.turnNumber = 1;
 	}
 	
-	public void createBid(Agent a, int type, String comm, int limit) {
+	//looks at agents to find ones who should make an offer
+	public void createOffers(ArrayList<Agent> agents) {
+		
+		for (Agent a: agents) {
+			ArrayList<String> consumedItems = a.getConsumedItems();
+			ArrayList<String> producedItems = a.getProducedItems();
+			
+			for (String c: consumedItems) {
+				this.createBid(a, "bid", c,  a.getMaxInventory());
+			}
+			for (String p: producedItems) {
+				this.createBid(a, "ask", p,  a.getMaxInventory());
+			}
+			
+		}
+		
+	}
+	
+	
+	public void createBid(Agent a, String type, String comm, int limit) {
 		double bid = a.getPriceBelief(comm);
 		int idealAmount = this.determineQuantity(a, comm, type);
 		int quant = Math.min(idealAmount, limit);
-				
-		Offer newBid = new Offer(a.getUuid(), type, comm, quant, bid, this.turnNumber);
-		switch(type) {
-			case 0:
-				this.bidBook.add(newBid);
-				break;
-			case 1:
-				this.askBook.add(newBid);
-				break;
+		if (quant > 0) {
+			Offer newBid = new Offer(a.getUuid(), type, comm, quant, bid, this.turnNumber, a.getAgentType());
+			switch(type) {
+				case "bid":
+					this.bidBook.add(newBid);
+					break;
+				case "ask":
+					this.askBook.add(newBid);
+					break;
+			}
 		}
 	}
 	
-	public int determineQuantity(Agent a, String comm, int type) {
+	
+	public int determineQuantity(Agent a, String comm, String offerType) {
 		double mean = this.getHistoricalPriceMean(comm);
-		int excessInventory = a.getExcessInventory(comm);
 		double favorability = a.getCommodityFavorability(comm, mean);
+		int excessInventory = a.getExcessInventory(comm);
 		int availableSpace = a.getExcessSpace(comm);
+		int quantity = 0;
 		
-		//bid or ask
-		if (type == 0)
-			return (int)Math.floor(favorability * excessInventory);
-		else if (type == 1)
-			return (int)Math.floor(favorability * availableSpace);
-		else
-			return 0;
+		if (offerType.equalsIgnoreCase("ask"))
+			quantity = (int)Math.floor(favorability * excessInventory);
+		else if (offerType.equalsIgnoreCase("bid"))
+			quantity = (int)Math.floor(favorability * availableSpace);
+		
+		return quantity;
 	}
 	
 	public double getHistoricalPriceMean(String c) {
 		//let's hear it for lambda!
-		ArrayList<Offer> commodityOffers = (ArrayList<Offer>) this.historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
-		OptionalDouble avg = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
-		if (avg.isPresent())
-			return avg.getAsDouble();
+		if (this.historicalRecords.size() > 0) {
+			ArrayList<Offer> commodityOffers = (ArrayList<Offer>) this.historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
+			OptionalDouble avg = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
+			if (avg.isPresent())
+				return avg.getAsDouble();
+		}
+		//returns below when there's no returned bids yet
+		return 0;
+	}
+	
+	public double getHistoricalMaxPrice(String c) {
+		if (this.historicalRecords.size() > 0) {
+			ArrayList<Offer> commodityOffers = (ArrayList<Offer>) this.historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
+			OptionalDouble max = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).max();
+			if (max.isPresent())
+				return max.getAsDouble();
+		}
+		//returns below when there's no returned bids yet
 		return 0;
 	}
 	
@@ -118,7 +153,14 @@ public class Clearinghouse {
 		}
 		//negatively change price beliefs for remaining offers
 		
-		
+		this.turnNumber++;
+	}
+	
+	public ArrayList<Offer> getBidBook() {
+		return this.bidBook;
+	}
+	public ArrayList<Offer> getAskBook() {
+		return this.askBook;
 	}
 	
 

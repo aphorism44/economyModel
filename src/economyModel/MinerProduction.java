@@ -17,9 +17,11 @@ public class MinerProduction implements ProductionBehavior {
 	}
 	
 	public LinkedHashMap<String, Integer> produce(LinkedHashMap<String, Integer> inventory, boolean hasTools) {
-		int ore = (int)inventory.get("ore");
-		int food = (int)inventory.get("food");
-		int money = (int)inventory.get("money");
+		
+		int ore = inventory.containsKey("ore") ? (int)inventory.get("ore") : 0;
+		int food = inventory.containsKey("food") ? (int)inventory.get("food") : 0;;
+		int taxes = 0;
+		
 		if (hasTools && food > 0) {
 			ore += 4;
 			food -= 1;
@@ -27,12 +29,12 @@ public class MinerProduction implements ProductionBehavior {
 			ore += 2;
 			food -=1;
 		} else {
-			money -= 2;
+			taxes -= 2;
 		}
 		
 		inventory.put("ore", ore);
 		inventory.put("food", food);
-		inventory.put("money", money);
+		inventory.put("taxMoney", taxes);
 		
 		return inventory;
 	}

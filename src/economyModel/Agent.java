@@ -8,6 +8,8 @@ public class Agent {
 
 	private static final double startingMoney = 1000;
 	private static final int inventorySize = 15;
+	private static final int startingGoods = 8;
+	
 	
 	private String agentType;
 	UUID id;
@@ -21,6 +23,7 @@ public class Agent {
 	
 	public Agent(String t, ProductionBehavior pb) {
 		this.agentType = t;
+		this.hasTools = true;
 		this.productionBehavior = pb;
 		this.inventory = new LinkedHashMap<String, Integer>();
 		this.money = this.startingMoney;
@@ -28,10 +31,33 @@ public class Agent {
 		this.priceBeliefs = new LinkedHashMap<String, PriceBelief>();
 		this.consumedItems = pb.getConsumedCommodities();
 		this.producedItems = pb.getProducedCommodities();
+		//initial inventories and price beliefs
 		for (String i: this.consumedItems) {
-			
+			inventory.put(i, startingGoods);
+			PriceBelief consB = new PriceBelief(i);
+			this.priceBeliefs.put(i, consB);
+		}
+		for (String i: this.producedItems) {
+			inventory.put(i, 0);
+			PriceBelief prodB = new PriceBelief(i);
+			this.priceBeliefs.put(i, prodB);
 		}
 		
+	}
+	
+	public void produce() {
+		this.inventory = this.productionBehavior.produce(this.inventory, this.hasTools);
+		//taxMoney key temporarily keeps track of fines for no production
+		if (this.inventory.containsKey("taxMoney")) {
+			this.money += this.inventory.get("taxMoney");
+			this.inventory.remove("taxMoney");
+		}
+		//make sure inventory doesn't exceed max spaces
+		this.inventory.forEach((key, value) -> {
+			if (value > this.inventorySize)
+				value = this.inventorySize;
+		});
+				
 	}
 	
 	public UUID getUuid() {
@@ -40,6 +66,10 @@ public class Agent {
 	
 	public int getInventoryCount(String commmodity) {
 		return this.inventory.get(commmodity);
+	}
+	
+	public String getAgentType() {
+		return this.agentType;
 	}
 	
 	public int getExcessInventory(String commodity) {
@@ -110,11 +140,23 @@ public class Agent {
 		this.priceBeliefs.put(comm, relevantBelief);
 	}
 	
-	public String toString() {
-		StringBuilder out = new StringBuilder();
-		
-		return out.toString();
+	public double getMoney() {
+		return this.money;
 	}
 	
+	
+	public LinkedHashMap<String, Integer> getInventory() {
+		return this.inventory;
+	}
+	
+	public ArrayList<String> getConsumedItems() {
+		return this.consumedItems;
+	}
+	public ArrayList<String> getProducedItems() {
+		return this.producedItems;
+	}
+	public int getMaxInventory() {
+		return this.inventorySize;
+	}
 	
 }
