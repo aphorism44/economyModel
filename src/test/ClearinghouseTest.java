@@ -17,7 +17,7 @@ public class ClearinghouseTest {
 	public void populateClearinghouse() {
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		Clearinghouse house = new Clearinghouse();
-		
+		/*
 		for (int i = 0; i < 5; i++) {
 			FarmerProduction fp = new FarmerProduction();
 			Agent farmer = new Agent("farmer", fp);
@@ -47,12 +47,21 @@ public class ClearinghouseTest {
 		
 		house.createOffers(agents);
 		
-		/*
+		
 		for (Offer bid: house.getBidBook())
 			System.out.println(bid.toString());
 		
 		for (Offer ask: house.getAskBook())
 			System.out.println(ask.toString());
+		
+		offerType: bid, commodity: ore, quantity: 11
+			, price: 27.0, agentType: refiner
+			, agentId: 3920b763-9947-46f7-847e-e1621734f84c
+
+		offerType: ask, commodity: tools, quantity: 7
+			, price: 48.7, agentType: blacksmith
+			, agentId: 331b4135-7bb2-4542-9a08-2ef4c9c03755
+
 		*/
 		
 		for (Offer bid: house.getBidBook()) {

@@ -19,7 +19,7 @@ public class Agent {
 	private LinkedHashMap<String, Integer> inventory;
 	private ArrayList<String> consumedItems;
 	private ArrayList<String> producedItems;
-	protected ProductionBehavior productionBehavior;
+	private ProductionBehavior productionBehavior;
 	
 	public Agent(String t, ProductionBehavior pb) {
 		this.agentType = t;
@@ -46,18 +46,12 @@ public class Agent {
 	}
 	
 	public void produce() {
-		this.inventory = this.productionBehavior.produce(this.inventory, this.hasTools);
-		//taxMoney key temporarily keeps track of fines for no production
-		if (this.inventory.containsKey("taxMoney")) {
-			this.money += this.inventory.get("taxMoney");
-			this.inventory.remove("taxMoney");
-		}
+		this.inventory = this.productionBehavior.produce(this.inventory);
 		//make sure inventory doesn't exceed max spaces
 		this.inventory.forEach((key, value) -> {
 			if (value > this.inventorySize)
 				value = this.inventorySize;
 		});
-				
 	}
 	
 	public UUID getUuid() {

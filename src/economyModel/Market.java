@@ -2,6 +2,7 @@ package economyModel;
 
 import java.util.ArrayList;
 
+
 public class Market {
 	
 	Clearinghouse house;
@@ -9,6 +10,7 @@ public class Market {
 	
 	public Market() {
 		house = new Clearinghouse();
+		/*
 		for (int i = 0; i < 5; i++) {
 			FarmerProduction fp = new FarmerProduction();
 			Agent farmer = new Agent("farmer", fp);
@@ -30,7 +32,7 @@ public class Market {
 			Agent miner = new Agent("miner", mp);
 			agents.add(miner);
 		}
-		
+		*/
 	}
 
 }
