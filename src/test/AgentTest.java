@@ -95,105 +95,69 @@ public class AgentTest {
 	        Map.Entry pair = (Map.Entry)rba.next();
 	        ArrayList<ProductionRule> prs = (ArrayList<ProductionRule>) pair.getValue();
 	        ProductionBehavior rb = new ProductionBehavior(prs);
-	        //behaviors.add(rb);
+	        behaviors.add(rb);
+	    }
+	    
+	    
+	    //confirm all the rules are working
+	    for (ProductionBehavior pb: behaviors) {
+	    	//System.out.println(pb.toString());
+	    	assertTrue(pb.isValid());
 	    }
 		
-		
-		/*
-		ProductionBehavior fp = new ProductionBehavior();
-		Agent farmer = new Agent("farmer", fp);
-		
-		assertTrue(farmer.getAgentType().equalsIgnoreCase("farmer") );
-		assertEquals(Math.floor(farmer.getMoney()), 1000.0, 5);
-		farmer.produce();
-		LinkedHashMap<String, Integer> inv = farmer.getInventory();
-		assertEquals((int)inv.get("wood"), 7);
-		assertEquals((int)inv.get("food"), 4);*/
+	    //finally, add the production behaviors into agents
+	    for (ProductionBehavior pb: behaviors) {
+	    	Agent a = new Agent(pb.getAgentType(), pb);
+	    	agents.add(a);
+	    }
+	    
+	    //checks
+	    for (Agent a: agents) {
+	    	LinkedHashMap<String, Integer> inv;
+	    	System.out.println(a.getAgentType());
+	    	System.out.println(a.getInventory());
+	    	a.produce();
+	    	System.out.println(a.getInventory());
+	    	
+	    	switch (a.getAgentType()) {
+	    	case "farmer":
+	    		assertEquals(Math.floor(a.getMoney()), 1000.0, 5);
+	    		inv = a.getInventory();
+	    		assertEquals((int)inv.get("wood"), 7);
+	    		assertEquals((int)inv.get("food"), 4);
+	    		break;
+	    	case "blacksmith":
+	    		assertEquals(Math.floor(a.getMoney()), 1000.0, 5);
+	    		inv = a.getInventory();
+	    		assertEquals((int)inv.get("food"), 7);
+	    		assertEquals((int)inv.get("metal"), 0);
+	    		assertEquals((int)inv.get("tools"), 8);
+	    		break;
+	    	case "lumberjack":
+	    		assertEquals(Math.floor(a.getMoney()), 1000.0, 5);
+	    		inv = a.getInventory();
+	    		assertEquals((int)inv.get("wood"), 2);
+	    		assertEquals((int)inv.get("food"), 7);
+	    		break;
+	    	case "refiner":
+	    		assertEquals(Math.floor(a.getMoney()), 1000.0, 5);
+	    		inv = a.getInventory();
+	    		assertEquals((int)inv.get("ore"), 0);
+	    		assertEquals((int)inv.get("metal"), 8);
+	    		assertEquals((int)inv.get("food"), 7);
+	    		break;
+	    	case "miner":
+	    		assertEquals(Math.floor(a.getMoney()), 1000.0, 5);
+	    		inv = a.getInventory();
+	    		assertEquals((int)inv.get("food"), 7);
+	    		assertEquals((int)inv.get("ore"), 4);
+	    		break;
+	    	
+	    	}
+	    	
+	    	
+	    	
+	    }
+	    
 	}
-	/*
-	@Test
-	public void createSmith() {
-		ProductionBehavior bp = new ProductionBehavior();
-		Agent blacksmith = new Agent("blacksmith", bp);
-		
-		assertTrue(blacksmith.getAgentType().equalsIgnoreCase("blacksmith"));
-		assertEquals(Math.floor(blacksmith.getMoney()), 1000.0, 5);
-		blacksmith.produce();
-		LinkedHashMap<String, Integer> inv = blacksmith.getInventory();
-		assertEquals((int)inv.get("food"), 7);
-		assertEquals((int)inv.get("metal"), 0);
-		assertEquals((int)inv.get("tools"), 8);
-	}
-	@Test
-	public void createLumberjack() {
-		ProductionBehavior lp = new ProductionBehavior();
-		Agent lumberjack = new Agent("lumberjack", lp);
-		
-		assertTrue(lumberjack.getAgentType().equalsIgnoreCase("lumberjack") );
-		assertEquals(Math.floor(lumberjack.getMoney()), 1000.0, 5);
-		lumberjack.produce();
-		LinkedHashMap<String, Integer> inv = lumberjack.getInventory();
-		assertEquals((int)inv.get("wood"), 2);
-		assertEquals((int)inv.get("food"), 7);
-	}
-	@Test
-	public void createRefiner() {
-		ProductionBehavior rp = new ProductionBehavior();
-		Agent refiner = new Agent("refiner", rp);
-		
-		assertTrue(refiner.getAgentType().equalsIgnoreCase("refiner") );
-		assertEquals(Math.floor(refiner.getMoney()), 1000.0, 5);
-		refiner.produce();
-		LinkedHashMap<String, Integer> inv = refiner.getInventory();
-		assertEquals((int)inv.get("ore"), 0);
-		assertEquals((int)inv.get("metal"), 8);
-		assertEquals((int)inv.get("food"), 7);
-	}
-	@Test
-	public void createMiner() {
-		ProductionBehavior mp = new ProductionBehavior();
-		Agent miner = new Agent("miner", mp);
-		
-		assertTrue(miner.getAgentType().equalsIgnoreCase("miner") );
-		assertEquals(Math.floor(miner.getMoney()), 1000.0, 5);
-		miner.produce();
-		LinkedHashMap<String, Integer> inv = miner.getInventory();
-		assertEquals((int)inv.get("food"), 7);
-		assertEquals((int)inv.get("ore"), 4);
-	}
-	@Test
-	public void testCreateMultiples() {
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		
-		for (int i = 0; i < 5; i++) {
-			ProductionBehavior fp = new ProductionBehavior();
-			Agent farmer = new Agent("farmer", fp);
-			agents.add(farmer);
-			
-			ProductionBehavior bp = new ProductionBehavior();
-			Agent blacksmith = new Agent("blacksmith", bp);
-			agents.add(blacksmith);
-			
-			ProductionBehavior lp = new ProductionBehavior();
-			Agent lumberjack = new Agent("lumberjack", lp);
-			agents.add(lumberjack);
-			
-			ProductionBehavior rp = new ProductionBehavior();
-			Agent refiner = new Agent("refiner", rp);
-			agents.add(refiner);
-			
-			ProductionBehavior mp = new ProductionBehavior();
-			Agent miner = new Agent("miner", mp);
-			agents.add(miner);
-		}
-		
-		assertEquals(agents.size(), 25);
-		
-		for (Agent a : agents)
-			a.produce();
-		
-	}
-	*/
 }
-//assertEquals
-//assertThat
