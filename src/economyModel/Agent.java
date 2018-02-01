@@ -14,7 +14,6 @@ public class Agent {
 	private String agentType;
 	UUID id;
 	private double money;
-	private boolean hasTools;
 	private LinkedHashMap<String, PriceBelief> priceBeliefs;
 	private LinkedHashMap<String, Integer> inventory;
 	private ArrayList<String> consumedItems;
@@ -23,7 +22,6 @@ public class Agent {
 	
 	public Agent(String t, ProductionBehavior pb) {
 		this.agentType = t;
-		this.hasTools = true;
 		this.productionBehavior = pb;
 		this.inventory = new LinkedHashMap<String, Integer>();
 		this.money = this.startingMoney;
@@ -42,6 +40,9 @@ public class Agent {
 			PriceBelief prodB = new PriceBelief(i);
 			this.priceBeliefs.put(i, prodB);
 		}
+		if (productionBehavior.getUsesTools())
+			inventory.put("tools", 1);
+		
 		
 	}
 	
@@ -151,6 +152,14 @@ public class Agent {
 	}
 	public int getMaxInventory() {
 		return this.inventorySize;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(productionBehavior.toString());
+		
+		
+		return sb.toString();
 	}
 	
 }

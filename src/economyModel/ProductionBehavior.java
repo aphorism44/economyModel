@@ -97,8 +97,8 @@ public class ProductionBehavior {
 			if (!inventory.containsKey("tools") || inventory.get("tools") < 1)
 				lacksTools = true;
 		
-		System.out.println(hasUpkeep);
-		System.out.println(lacksTools);
+		//System.out.println(hasUpkeep);
+		//System.out.println(lacksTools);
 		
 		//full production occurs when agent has basic upkeep and don't lack tools
 		if (hasUpkeep && !lacksTools) {
@@ -140,9 +140,13 @@ public class ProductionBehavior {
 				inventory.put(commodity, currentInventory);
 				break;
 			case CONSUME_ALL:
+				//System.out.println("consume all: " + commodity);
 				match = pr.getMatchedCommodity();
+				//System.out.println("to make: " + match);
 				int otherInventory = inventory.get(match);
-				otherInventory += amount;
+				//System.out.println("otherInventory: " + otherInventory);
+				//System.out.println("currentInventory: " + currentInventory);
+				otherInventory += currentInventory;
 				inventory.put(commodity, 0);
 				inventory.put(match, otherInventory);
 				break;
@@ -188,6 +192,10 @@ public class ProductionBehavior {
 	
 	public String getAgentType() {
 		return this.agentType;
+	}
+	
+	public boolean getUsesTools() {
+		return this.usesTools;
 	}
 	
 	//for testing

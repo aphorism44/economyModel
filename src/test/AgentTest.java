@@ -111,13 +111,13 @@ public class AgentTest {
 	    	agents.add(a);
 	    }
 	    
-	    //checks
+	    //checks the production behavior
 	    for (Agent a: agents) {
 	    	LinkedHashMap<String, Integer> inv;
-	    	System.out.println(a.getAgentType());
-	    	System.out.println(a.getInventory());
+	    	//System.out.println(a.getAgentType());
+	    	//System.out.println(a.getInventory());
 	    	a.produce();
-	    	System.out.println(a.getInventory());
+	    	//System.out.println(a.getInventory());
 	    	
 	    	switch (a.getAgentType()) {
 	    	case "farmer":
