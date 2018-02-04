@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.OptionalDouble;
 
 public class Clearinghouse {
@@ -24,7 +25,10 @@ public class Clearinghouse {
 	
 	//looks at agents to find ones who should make an offer
 	public void createOffers(ArrayList<Agent> agents) {
-		
+		//clear the bid/ask books
+		bidBook.clear();
+		askBook.clear();
+				
 		for (Agent a: agents) {
 			ArrayList<String> consumedItems = a.getConsumedItems();
 			ArrayList<String> producedItems = a.getProducedItems();
@@ -86,24 +90,27 @@ public class Clearinghouse {
 		return quantity;
 	}
 	
-	public double getHistoricalPriceMean(String c) {
+	public int getHistoricalPriceMean(String c) {
 		//let's hear it for lambda!
 		if (historicalRecords.size() > 0) {
-			ArrayList<Offer> commodityOffers = (ArrayList<Offer>) historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
+			ArrayList<Offer> commodityOffers = (ArrayList<Offer>)historicalRecords.stream().filter(o -> o.getCommodityType().equals(c)).collect(Collectors.toList());
 			OptionalDouble avg = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
 			if (avg.isPresent())
-				return avg.getAsDouble();
+				return (int)Math.round(avg.getAsDouble());
 		}
 		//returns below when there's no returned bids yet
 		return 0;
 	}
 	
-	public double getHistoricalMaxPrice(String c) {
+	public int getHistoricalMaxPrice(String c) {
 		if (historicalRecords.size() > 0) {
 			ArrayList<Offer> commodityOffers = (ArrayList<Offer>) historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
-			OptionalDouble max = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).max();
+			for (Offer o: commodityOffers)
+				System.out.println(o.toString());
+			
+			OptionalDouble max = commodityOffers.stream().mapToDouble(o -> o.getPricePerUnit()).max();
 			if (max.isPresent())
-				return max.getAsDouble();
+				return (int)Math.round(max.getAsDouble());
 		}
 		//returns below when there's no returned bids yet
 		return 0;
@@ -111,6 +118,7 @@ public class Clearinghouse {
 	
 	
 	public void resolveOffers(String commodity, LinkedHashMap<UUID, Agent> agents ) {
+		
 		//grab all bids for inputed commodity;
 		ArrayList<Offer> bids= new ArrayList<Offer>();
 		ArrayList<Offer> asks = new ArrayList<Offer>();
@@ -137,6 +145,8 @@ public class Clearinghouse {
 			Offer ask = asks.get(0);
 			int tradeQuantity = Math.min(bid.getQuantity(), ask.getQuantity());
 			int clearingPrice = (bid.getOffer() + ask.getOffer()) / 2;
+			if (clearingPrice < 1)
+				clearingPrice = 1; //never 0 or less
 			
 			if (tradeQuantity > 0) {
 				Agent buyer = agents.get(bid.getAgentId());
@@ -151,6 +161,7 @@ public class Clearinghouse {
 				
 				if (bid.getQuantity() < 1) {
 					bid.acceptOffer();
+					buyer.updatePriceBelief(bid, 0);
 					removeFromBidBook(bid.getId());
 					historicalRecords.add(bids.remove(0));
 				} else {
@@ -159,6 +170,7 @@ public class Clearinghouse {
 				
 				if (ask.getQuantity() < 1) {
 					ask.acceptOffer();
+					seller.updatePriceBelief(ask, 0);
 					removeFromAskBook(ask.getId());
 					historicalRecords.add(asks.remove(0));
 				} else {
@@ -168,11 +180,21 @@ public class Clearinghouse {
 			}
 			
 			//the accepted offers are now in historicalRecords, tied to this turn number
-			//remaining bids are in bid and ask
+			//rejected (partially or whole) are in bid and ask
 			
 			
 		}
-		//change price beliefs for remaining offers
+		//change price beliefs for rejected offers
+		for (Offer bid: bids) {
+			int mean = getHistoricalPriceMean(bid.getCommodityType());
+			Agent ab = agents.get(bid.getAgentId());
+			ab.updatePriceBelief(bid, mean);
+		}
+		for (Offer ask: asks) {
+			int mean = getHistoricalPriceMean(ask.getCommodityType());
+			Agent ab = agents.get(ask.getAgentId());
+			ab.updatePriceBelief(ask, mean);
+		}
 		
 		
 		turnNumber++;

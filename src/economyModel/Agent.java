@@ -9,7 +9,7 @@ public class Agent {
 	private static final int startingMoney = 1000;
 	private static final int inventorySize = 15;
 	private static final int startingGoods = 8;
-	
+	private static final double replenishThreshold = 0.2;
 	
 	private String agentType;
 	UUID id;
@@ -37,13 +37,17 @@ public class Agent {
 			PriceBelief consB = new PriceBelief(i);
 			priceBeliefs.put(i, consB);
 		}
+		
 		for (String i: producedItems) {
 			inventory.put(i, 0);
 			PriceBelief prodB = new PriceBelief(i);
 			priceBeliefs.put(i, prodB);
 		}
-		if (productionBehavior.getUsesTools())
+		if (productionBehavior.getUsesTools()) {
 			inventory.put("tools", 1);
+			PriceBelief toolB = new PriceBelief("tools");
+			priceBeliefs.put("tools", toolB);
+		}
 		
 		
 	}
@@ -135,15 +139,22 @@ public class Agent {
 	}
 	
 	//update price belief
-	public void updatePriceBelief(Offer o) {
+	public void updatePriceBelief(Offer o, int mean) {
 		String comm = o.getCommodityType();
+		String type = o.getOfferType();
 		PriceBelief relevantBelief = priceBeliefs.get(comm);
-		if (o.getOfferAccepted()) {
+		if (o.getOfferAccepted() || o.getOfferPartlyAccepted()) {
 			relevantBelief.contractBounds();
 		} else {
 			//if they tried to purchase a required
 			//consumed commodity and failed, there
 			//will be a _drastic_ belief adjustment
+			boolean lowInventory = false;
+			int currentInventory = getInventoryCount(comm);
+			if (type.equals("bid") && currentInventory < inventorySize * replenishThreshold)
+				lowInventory = true;
+			relevantBelief.expandBounds(lowInventory, mean);
+			
 		}
 		
 		priceBeliefs.put(comm, relevantBelief);

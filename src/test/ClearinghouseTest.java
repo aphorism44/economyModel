@@ -20,9 +20,11 @@ public class ClearinghouseTest {
 		
 		m.agentsProduce();
 		
+		/*
 		System.out.println("after production agents");
 		for (Agent a: m.getAgents())
 			System.out.println(a.getInventoryString());
+		*/
 		
 		m.agentsCreateOffers();
 		
@@ -120,13 +122,15 @@ public class ClearinghouseTest {
 		System.out.println("filled " + m.getHistoricalRecords().size());
 		System.out.println("unfilled bids " + m.getBidBook().size());
 		System.out.println("unfilled asks " + m.getAskBook().size());
+		
 		for (Offer o: m.getHistoricalRecords())
 			System.out.println(o.toString());
+		*/
 		
 		System.out.println("final agents");
 		for (Agent a: m.getAgents())
-			System.out.println(a.getInventoryString());
-		*/
+			System.out.println(a.toString());
+		
 		
 	}
 	

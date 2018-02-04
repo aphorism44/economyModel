@@ -61,13 +61,20 @@ public class PriceBelief {
 	}
 	
 	//below is run with unsuccessful offer; expends bounds around mean
-	public void expandBounds(Boolean lowInventory) {
+	//while adjusting the mean as well
+	public void expandBounds(Boolean lowInventory, int historicPriceMean) {
 		int spread = upperPriceBound - lowerPriceBound;
 		int adjustment = (int)Math.round(spread * boundAdjustment);
-		if (lowInventory)
+		//if a low inventory, shift the entire mean and drastically expand range
+		if (lowInventory) {	
 			adjustment *= 5;
+			lowerPriceBound = historicPriceMean - spread / 2;
+			upperPriceBound = historicPriceMean + spread / 2;
+		} 
+
 		lowerPriceBound -= adjustment;
 		upperPriceBound += adjustment;
+				
 	}
 	
 	

@@ -50,6 +50,10 @@ public class Offer {
 		return offer;
 	}
 	
+	public String getOfferType() {
+		return offerType;
+	}
+	
 	public UUID getAgentId() {
 		return agentId;
 	}
@@ -68,7 +72,10 @@ public class Offer {
 	}
 	
 	public int getPricePerUnit() {
-		return offer / quantity;
+		if (quantity > 0)
+			return offer / quantity;
+		else
+			return offer;
 	}
 	
 	//should only take negative values; keep as is in case changes are needed
