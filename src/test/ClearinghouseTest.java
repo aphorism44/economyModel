@@ -14,46 +14,25 @@ public class ClearinghouseTest {
 	private ArrayList<Agent> agents;
 	
 	@Test
-	public void populateClearinghouse() {
-		ArrayList<Agent> agents = new ArrayList<Agent>();
-		Clearinghouse house = new Clearinghouse();
-		/*
-		for (int i = 0; i < 5; i++) {
-			FarmerProduction fp = new FarmerProduction();
-			Agent farmer = new Agent("farmer", fp);
-			agents.add(farmer);
-			
-			BlacksmithProduction bp = new BlacksmithProduction();
-			Agent blacksmith = new Agent("blacksmith", bp);
-			agents.add(blacksmith);
-			
-			LumberjackProduction lp = new LumberjackProduction();
-			Agent lumberjack = new Agent("lumberjack", lp);
-			agents.add(lumberjack);
-			
-			RefinerProduction rp = new RefinerProduction();
-			Agent refiner = new Agent("refiner", rp);
-			agents.add(refiner);
-			
-			MinerProduction mp = new MinerProduction();
-			Agent miner = new Agent("miner", mp);
-			agents.add(miner);
-		}
+	public void createMarket() {
+
+		Market m = new Market(5);
 		
-		assertEquals(agents.size(), 25);
+		assertEquals(m.getAgentCount() , 25);
 		
-		for (Agent a: agents)
-			a.produce();
-		
-		house.createOffers(agents);
+		m.agentsProduce();
 		
 		
-		for (Offer bid: house.getBidBook())
+		m.agentsCreateOffers();
+		
+		
+		
+		for (Offer bid: m.getBidBook())
 			System.out.println(bid.toString());
 		
-		for (Offer ask: house.getAskBook())
+		for (Offer ask: m.getAskBook())
 			System.out.println(ask.toString());
-		
+		/*
 		offerType: bid, commodity: ore, quantity: 11
 			, price: 27.0, agentType: refiner
 			, agentId: 3920b763-9947-46f7-847e-e1621734f84c
@@ -61,12 +40,14 @@ public class ClearinghouseTest {
 		offerType: ask, commodity: tools, quantity: 7
 			, price: 48.7, agentType: blacksmith
 			, agentId: 331b4135-7bb2-4542-9a08-2ef4c9c03755
-
 		*/
 		
-		for (Offer bid: house.getBidBook()) {
+		
+		for (Offer bid: m.getBidBook()) {
 			String commodity = bid.getCommodityType();
 			String agentType = bid.getCreatorAgentType();
+			int quantity = bid.getQuantity();
+			assert(quantity > 0);
 			switch(commodity) {
 			case "wood":
 				assertEquals(agentType, "farmer");
@@ -80,12 +61,22 @@ public class ClearinghouseTest {
 			case "metal":
 				assertEquals(agentType, "blacksmith");
 				break;
+			case "tools":
+				assertNotEquals(agentType, "blacksmith");
+				assert(quantity == 1);
+				break;
+			default:
+				fail();
+				break;
+				
 			}
 		}
 		
-		for (Offer ask: house.getAskBook()) {
+		for (Offer ask: m.getAskBook()) {
 			String commodity = ask.getCommodityType();
 			String agentType = ask.getCreatorAgentType();
+			int quantity = ask.getQuantity();
+			assert(quantity > 0);
 			switch(commodity) {
 			case "wood":
 				assertEquals(agentType, "lumberjack");
@@ -102,12 +93,14 @@ public class ClearinghouseTest {
 			case "tools":
 				assertEquals(agentType, "blacksmith");
 				break;
+			default:
+				fail();
+				break;
 			}
 		}
+		
 		
 		
 	}
 	
 }
-//assertEquals
-//assertThat

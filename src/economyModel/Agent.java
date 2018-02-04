@@ -19,26 +19,28 @@ public class Agent {
 	private ArrayList<String> consumedItems;
 	private ArrayList<String> producedItems;
 	private ProductionBehavior productionBehavior;
+	private boolean usesTools;
 	
 	public Agent(String t, ProductionBehavior pb) {
-		this.agentType = t;
-		this.productionBehavior = pb;
-		this.inventory = new LinkedHashMap<String, Integer>();
-		this.money = this.startingMoney;
-		this.id = UUID.randomUUID();
-		this.priceBeliefs = new LinkedHashMap<String, PriceBelief>();
-		this.consumedItems = pb.getConsumedCommodities();
-		this.producedItems = pb.getProducedCommodities();
+		agentType = t;
+		productionBehavior = pb;
+		inventory = new LinkedHashMap<String, Integer>();
+		money = startingMoney;
+		id = UUID.randomUUID();
+		priceBeliefs = new LinkedHashMap<String, PriceBelief>();
+		consumedItems = pb.getConsumedCommodities();
+		producedItems = pb.getProducedCommodities();
+		usesTools = pb.getUsesTools();
 		//initial inventories and price beliefs
-		for (String i: this.consumedItems) {
+		for (String i: consumedItems) {
 			inventory.put(i, startingGoods);
 			PriceBelief consB = new PriceBelief(i);
-			this.priceBeliefs.put(i, consB);
+			priceBeliefs.put(i, consB);
 		}
-		for (String i: this.producedItems) {
+		for (String i: producedItems) {
 			inventory.put(i, 0);
 			PriceBelief prodB = new PriceBelief(i);
-			this.priceBeliefs.put(i, prodB);
+			priceBeliefs.put(i, prodB);
 		}
 		if (productionBehavior.getUsesTools())
 			inventory.put("tools", 1);
@@ -47,31 +49,31 @@ public class Agent {
 	}
 	
 	public void produce() {
-		this.inventory = this.productionBehavior.produce(this.inventory);
+		inventory = productionBehavior.produce(inventory);
 		//make sure inventory doesn't exceed max spaces
-		this.inventory.forEach((key, value) -> {
-			if (value > this.inventorySize)
-				value = this.inventorySize;
+		inventory.forEach((key, value) -> {
+			if (value > inventorySize)
+				value = inventorySize;
 		});
 	}
 	
 	public UUID getUuid() {
-		return this.id;
+		return id;
 	}
 	
 	public int getInventoryCount(String commmodity) {
-		return this.inventory.get(commmodity);
+		return inventory.get(commmodity);
 	}
 	
 	public String getAgentType() {
-		return this.agentType;
+		return agentType;
 	}
 	
 	public int getExcessInventory(String commodity) {
 		//get the count of matching produced items
 		int excess = 0;
-		if (this.producedItems.contains(commodity))
-			excess = this.inventory.get(commodity);
+		if (producedItems.contains(commodity))
+			excess = inventory.get(commodity);
 		
 		return excess;
 	}
@@ -79,19 +81,25 @@ public class Agent {
 	public int getExcessSpace(String commodity) {
 		//find out how much space is left for needed commodity
 		int amount = 0, space = 0;
-		if (this.consumedItems.contains(commodity)) {
-			amount = this.inventory.get(commodity);
-			space = this.inventorySize - amount;
+		if (consumedItems.contains(commodity)) {
+			amount = inventory.get(commodity);
+			space = inventorySize - amount;
 		}
 		
 		return space;
 	}
 	
+	//check if you're missing a tool
+	public boolean needsTools() {
+		int toolCount = inventory.get("tools");
+		return usesTools && toolCount < 1;
+	}
+	
 	public double getPriceBelief(String commodity) {
 		double guessedBid = 0;
 		//grab a random number within the price belief bounds
-		if (this.priceBeliefs.containsKey(commodity))
-			guessedBid = this.priceBeliefs.get(commodity).getRandomBid();
+		if (priceBeliefs.containsKey(commodity))
+			guessedBid = priceBeliefs.get(commodity).getRandomBid();
 		
 		return guessedBid;
 	}
@@ -100,8 +108,8 @@ public class Agent {
 	public double getCommodityFavorability(String commodity, double marketMean) {
 		double favorability = 0.0;
 		
-		if (this.priceBeliefs.containsKey(commodity))
-			favorability = this.priceBeliefs.get(commodity).getRangePenetration(marketMean);
+		if (priceBeliefs.containsKey(commodity))
+			favorability = priceBeliefs.get(commodity).getRangePenetration(marketMean);
 		
 		return favorability;
 		
@@ -110,20 +118,20 @@ public class Agent {
 	
 	//n will be positive for buyers and negative for sellers
 	public void updateInventory(String c, int n) {
-		int inv = this.inventory.get(c);
+		int inv = inventory.get(c);
 		inv += n;
-		inv = Math.min(inv, this.inventorySize);
-		this.inventory.put(c, inv);
+		inv = Math.min(inv, inventorySize);
+		inventory.put(c, inv);
 	}
 	
 	public void updateMoney(double n) {
-		this.money += n;
+		money += n;
 	}
 	
 	//update price belief
 	public void updatePriceBelief(Offer o) {
 		String comm = o.getCommodityType();
-		PriceBelief relevantBelief = this.priceBeliefs.get(comm);
+		PriceBelief relevantBelief = priceBeliefs.get(comm);
 		if (o.getOfferAccepted()) {
 			relevantBelief.contractBounds();
 		} else {
@@ -132,26 +140,30 @@ public class Agent {
 			//will be a _drastic_ belief adjustment
 		}
 		
-		this.priceBeliefs.put(comm, relevantBelief);
+		priceBeliefs.put(comm, relevantBelief);
 	}
 	
 	public double getMoney() {
-		return this.money;
+		return money;
 	}
 	
 	
 	public LinkedHashMap<String, Integer> getInventory() {
-		return this.inventory;
+		return inventory;
 	}
 	
 	public ArrayList<String> getConsumedItems() {
-		return this.consumedItems;
+		ArrayList<String> cItems = (ArrayList<String>)consumedItems.clone();
+		cItems.remove("money");
+		return cItems;
 	}
 	public ArrayList<String> getProducedItems() {
-		return this.producedItems;
+		ArrayList<String> pItems = (ArrayList<String>)producedItems.clone();
+		pItems.remove("money");
+		return pItems;
 	}
 	public int getMaxInventory() {
-		return this.inventorySize;
+		return inventorySize;
 	}
 	
 	public String toString() {

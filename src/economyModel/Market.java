@@ -1,6 +1,17 @@
 package economyModel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class Market {
@@ -8,31 +19,112 @@ public class Market {
 	Clearinghouse house;
 	ArrayList<Agent> agents;
 	
-	public Market() {
+	public Market(int agentMultiplier) {
+		agents = new ArrayList<Agent>();
 		house = new Clearinghouse();
-		/*
-		for (int i = 0; i < 5; i++) {
-			FarmerProduction fp = new FarmerProduction();
-			Agent farmer = new Agent("farmer", fp);
-			agents.add(farmer);
-			
-			BlacksmithProduction bp = new BlacksmithProduction();
-			Agent blacksmith = new Agent("blacksmith", bp);
-			agents.add(blacksmith);
-			
-			LumberjackProduction lp = new LumberjackProduction();
-			Agent lumberjack = new Agent("lumberjack", lp);
-			agents.add(lumberjack);
-			
-			RefinerProduction rp = new RefinerProduction();
-			Agent refiner = new Agent("refiner", rp);
-			agents.add(refiner);
-			
-			MinerProduction mp = new MinerProduction();
-			Agent miner = new Agent("miner", mp);
-			agents.add(miner);
-		}
-		*/
+		createAgents(agentMultiplier);
 	}
+	
+	
+	public void agentsProduce() {
+		for (Agent a: agents)
+			a.produce();
+	}
+	
+	public void agentsCreateOffers() {
+		house.createOffers(agents);
+	}
+	
+	
+	public int getAgentCount() {
+		return agents.size();
+	}
+	
+	
+	
+	
+	
+	
+	public void createAgents(int n) {
+		
+		String txtFileName = "C:\\Users\\Jesse\\eclipse-workspace\\economyModel\\src\\productionData.csv";
+		boolean fileOpened = false; 
+		ArrayList<String> csvLines = null;
+		//below are the rules to be turned into behaviors, then agents
+		ArrayList<ProductionRule> rules = new ArrayList<ProductionRule>();
+		LinkedHashMap<String, ArrayList<ProductionRule>> ruleByAgent = new LinkedHashMap<String, ArrayList<ProductionRule>>();
+		//the behaviors
+		ArrayList<ProductionBehavior> behaviors = new ArrayList<ProductionBehavior>();
+		
+		//using Java 8 streams
+		try (Stream<String> stream = Files.lines(Paths.get(txtFileName))) {
+			csvLines = (ArrayList<String>) stream.collect(Collectors.toList());
+			fileOpened = true;
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		
+		//role_name,transaction_type,commodity_name,quantity,action,matched_commodity
+		//parse the lines
+		if (fileOpened) {
+			for (String s: csvLines) {
+				String[] line = s.split(",");
+				String roleName = line[0];
+				String transactionType = line[1];
+				String comm = line[2];
+				String qStr = line[3];
+				int q = 0;
+				try {
+					q = Integer.parseInt(qStr);
+				} catch (NumberFormatException nfe) {
+					System.out.println("hit number exception");
+					break;
+				}
+				String action = line[4];
+				String matchComm = line[5];
+				if (matchComm.trim().length() < 1)
+					matchComm = null;
+				
+				ProductionRule pr = new ProductionRule(roleName, comm, q, transactionType, action, matchComm);
+				rules.add(pr);
+				ruleByAgent.put(roleName, new ArrayList<ProductionRule>());
+			}
+		}
+		
+		//sort rules by agen
+		for (ProductionRule rule: rules) {
+			ArrayList agentBehaviors = ruleByAgent.get(rule.getAgentType());
+			agentBehaviors.add(rule);
+			ruleByAgent.put(rule.getAgentType(), agentBehaviors);
+			
+		}
+		
+		//turn rules into behaviors
+		Iterator rba = ruleByAgent.entrySet().iterator();
+	    while (rba.hasNext()) {
+	        Map.Entry pair = (Map.Entry)rba.next();
+	        ArrayList<ProductionRule> prs = (ArrayList<ProductionRule>) pair.getValue();
+	        ProductionBehavior rb = new ProductionBehavior(prs);
+	        behaviors.add(rb);
+	    }
+		
+	    //finally, add the production behaviors into agents
+	    for (int i = 0; i < n; i++) {
+	    	for (ProductionBehavior pb: behaviors) {
+		    	Agent a = new Agent(pb.getAgentType(), pb);
+		    	agents.add(a);	
+		    }
+	    }   
+	}
+	
+	
+	//using below for unit testing
+	public ArrayList<Offer> getBidBook() {
+		return house.getBidBook();
+	}
+	public ArrayList<Offer> getAskBook() {
+		return house.getAskBook();
+	}
+	
 
 }

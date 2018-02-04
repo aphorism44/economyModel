@@ -4,9 +4,6 @@ import economyModel.*;
 
 import static org.junit.Assert.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,10 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.ParseException;
 
 import org.junit.Test;
-import org.junit.Assert;
 
 public class AgentTest {
 

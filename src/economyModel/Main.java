@@ -4,7 +4,7 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		Market m = new Market();
+		Market m = new Market(5);
 		
 
 	}

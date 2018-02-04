@@ -14,67 +14,67 @@ public class Offer {
 	private String creatorAgentType;
 	
 	public Offer(UUID aId, String type, String commodity, int quant, double bid, int turnNo, String agentType) {
-		this.offerType = type;
-		this.commodityType = commodity.toLowerCase();
-		this.quantity = quant;
-		this.offer = bid;
-		this.offerAccepted = false;
-		this.agentId = aId;
-		this.turnNumber = turnNo;
-		this.creatorAgentType = agentType;
+		offerType = type;
+		commodityType = commodity.toLowerCase();
+		quantity = quant;
+		offer = bid;
+		offerAccepted = false;
+		agentId = aId;
+		turnNumber = turnNo;
+		creatorAgentType = agentType;
 	}
 	
 	public boolean isOfCommodity(String c) {
-		if (c.toLowerCase().equals(this.commodityType))
+		if (c.toLowerCase().equals(commodityType))
 			return true;
 		return false;
 	}
 	
 	public int getQuantity() {
-		return this.quantity;
+		return quantity;
 	}
 	
 	public String getCommodityType() {
-		return this.commodityType;
+		return commodityType;
 	}
 	
 	public String getCreatorAgentType() {
-		return this.creatorAgentType;
+		return creatorAgentType;
 	}
 	
 	public double getOffer() {
-		return this.offer;
+		return offer;
 	}
 	
 	public UUID getId() {
-		return this.agentId;
+		return agentId;
 	}
 	
 	public void acceptOffer() {
-		this.offerAccepted = true;
+		offerAccepted = true;
 	}
 	
 	public double getPricePerUnit() {
-		return this.offer / this.quantity;
+		return offer / quantity;
 	}
 	
 	//should only take negative values; keep as is in case changes are needed
 	public void updateQuantity(int n) {
-		this.quantity += n;
+		quantity += n;
 	}
 	
 	public boolean getOfferAccepted() {
-		return this.offerAccepted;
+		return offerAccepted;
 	}
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();
-		s.append("offerType: " + this.offerType);
-		s.append(", commodity: " + this.commodityType);
-		s.append(", quantity: " + this.quantity);
-		s.append(", price: " + this.offer);
-		s.append(", agentType: " + this.creatorAgentType);
-		s.append(", agentId: " + this.agentId + "\n");
+		s.append("offerType: " + offerType);
+		s.append(", commodity: " + commodityType);
+		s.append(", quantity: " + quantity);
+		s.append(", price: " + offer);
+		s.append(", agentType: " + creatorAgentType);
+		s.append(", agentId: " + agentId + "\n");
 		
 		return s.toString();
 	}
