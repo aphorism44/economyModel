@@ -2,6 +2,7 @@ package economyModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.OptionalDouble;
@@ -46,7 +47,7 @@ public class Clearinghouse {
 	
 	
 	public void createBid(Agent a, String type, String comm, int limit) {
-		double bid = a.getPriceBelief(comm);
+		int bid = a.getPriceBelief(comm);
 		int idealAmount = 0;
 		
 		//you can only buy one tool at a time
@@ -114,6 +115,7 @@ public class Clearinghouse {
 		ArrayList<Offer> bids= new ArrayList<Offer>();
 		ArrayList<Offer> asks = new ArrayList<Offer>();
 		
+		//note that the offers in books and here are seperate
 		for (Offer o: bidBook) {
 			if (o.isOfCommodity(commodity))
 				bids.add(o);
@@ -134,36 +136,44 @@ public class Clearinghouse {
 			Offer bid = bids.get(0);
 			Offer ask = asks.get(0);
 			int tradeQuantity = Math.min(bid.getQuantity(), ask.getQuantity());
-			double clearingPrice = (bid.getOffer() + ask.getOffer()) / 2.0;
+			int clearingPrice = (bid.getOffer() + ask.getOffer()) / 2;
 			
 			if (tradeQuantity > 0) {
-				Agent buyer = agents.get(bid.getId());
-				Agent seller = agents.get(ask.getId());
-				double cost = tradeQuantity * clearingPrice;
+				Agent buyer = agents.get(bid.getAgentId());
+				Agent seller = agents.get(ask.getAgentId());
+				int cost = tradeQuantity * clearingPrice;
 				seller.updateInventory(commodity, -tradeQuantity);
-				seller.updateMoney(clearingPrice);
+				seller.updateMoney(cost);
 				buyer.updateInventory(commodity, tradeQuantity);
-				buyer.updateMoney(-clearingPrice);
+				buyer.updateMoney(-cost);
 				bid.updateQuantity(-tradeQuantity);
 				ask.updateQuantity(-tradeQuantity);
 				
 				if (bid.getQuantity() < 1) {
 					bid.acceptOffer();
-					
-					
+					removeFromBidBook(bid.getId());
 					historicalRecords.add(bids.remove(0));
+				} else {
+					bid.acceptPartialOffer();
 				}
 				
 				if (ask.getQuantity() < 1) {
 					ask.acceptOffer();
+					removeFromAskBook(ask.getId());
 					historicalRecords.add(asks.remove(0));
+				} else {
+					ask.acceptPartialOffer();
 				}
 				
 			}
 			
+			//the accepted offers are now in historicalRecords, tied to this turn number
+			//remaining bids are in bid and ask
+			
 			
 		}
-		//negatively change price beliefs for remaining offers
+		//change price beliefs for remaining offers
+		
 		
 		turnNumber++;
 	}
@@ -173,6 +183,31 @@ public class Clearinghouse {
 	}
 	public ArrayList<Offer> getAskBook() {
 		return askBook;
+	}
+	public ArrayList<Offer> getHistoricalRecords() {
+		return historicalRecords;
+	}
+	public void removeFromBidBook(UUID id) {
+		
+		Iterator<Offer> bi = bidBook.iterator();
+		while (bi.hasNext()) {
+		    UUID bId = bi.next().getId();
+		    if (bId.equals(id)) {
+		    	bi.remove();
+		    	break;
+		    }
+		}
+				
+	}
+	public void removeFromAskBook(UUID id) {
+		Iterator<Offer> ai = askBook.iterator();
+		while (ai.hasNext()) {
+		    UUID aId = ai.next().getId();
+		    if (aId.equals(id)) {
+		    	ai.remove();
+		    	break;
+		    }
+		}
 	}
 	
 

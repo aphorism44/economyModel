@@ -51,6 +51,10 @@ public class ProductionRule {
 			quantity = 1;
 			produceAction = ProductionAction.CHECK;
 			break;
+		case "fine":
+			quantity = q;
+			produceAction = ProductionAction.FINE;
+			break;
 		case "consume_all":
 			quantity = 0;
 			produceAction = ProductionAction.CONSUME_ALL;

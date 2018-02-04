@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public class Agent {
 
-	private static final double startingMoney = 1000;
+	private static final int startingMoney = 1000;
 	private static final int inventorySize = 15;
 	private static final int startingGoods = 8;
 	
 	
 	private String agentType;
 	UUID id;
-	private double money;
+	private int money;
 	private LinkedHashMap<String, PriceBelief> priceBeliefs;
 	private LinkedHashMap<String, Integer> inventory;
 	private ArrayList<String> consumedItems;
@@ -50,6 +50,12 @@ public class Agent {
 	
 	public void produce() {
 		inventory = productionBehavior.produce(inventory);
+		//handle fines
+		if (inventory.containsKey("fine")) {
+			money -= inventory.get("fine");
+			inventory.remove("fine");
+		}
+		
 		//make sure inventory doesn't exceed max spaces
 		inventory.forEach((key, value) -> {
 			if (value > inventorySize)
@@ -95,8 +101,8 @@ public class Agent {
 		return usesTools && toolCount < 1;
 	}
 	
-	public double getPriceBelief(String commodity) {
-		double guessedBid = 0;
+	public int getPriceBelief(String commodity) {
+		int guessedBid = 0;
 		//grab a random number within the price belief bounds
 		if (priceBeliefs.containsKey(commodity))
 			guessedBid = priceBeliefs.get(commodity).getRandomBid();
@@ -124,7 +130,7 @@ public class Agent {
 		inventory.put(c, inv);
 	}
 	
-	public void updateMoney(double n) {
+	public void updateMoney(int n) {
 		money += n;
 	}
 	
@@ -143,7 +149,7 @@ public class Agent {
 		priceBeliefs.put(comm, relevantBelief);
 	}
 	
-	public double getMoney() {
+	public int getMoney() {
 		return money;
 	}
 	
@@ -154,12 +160,10 @@ public class Agent {
 	
 	public ArrayList<String> getConsumedItems() {
 		ArrayList<String> cItems = (ArrayList<String>)consumedItems.clone();
-		cItems.remove("money");
 		return cItems;
 	}
 	public ArrayList<String> getProducedItems() {
 		ArrayList<String> pItems = (ArrayList<String>)producedItems.clone();
-		pItems.remove("money");
 		return pItems;
 	}
 	public int getMaxInventory() {
@@ -169,7 +173,23 @@ public class Agent {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(productionBehavior.toString());
+		sb.append(", money:" + money);
+		sb.append(", inventory:");
+		inventory.forEach((key, value) -> {
+			sb.append(key + ":" + value + " ");
+		});
 		
+		return sb.toString();
+	}
+	
+	public String getInventoryString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("agentType: " + agentType);
+		sb.append(", money:" + money);
+		sb.append(", inventory:");
+		inventory.forEach((key, value) -> {
+			sb.append(key + ":" + value + " ");
+		});
 		
 		return sb.toString();
 	}

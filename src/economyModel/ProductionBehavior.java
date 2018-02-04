@@ -114,9 +114,7 @@ public class ProductionBehavior {
 			inventory = updateInventory(partialProduction, inventory);
 		//without basic upkeep, agent is fined
 		} else {
-			int money = inventory.get("money");
-			money -= fine;
-			inventory.put("money", money);
+			inventory.put("fine", fine);
 		}
 		
 		return inventory;

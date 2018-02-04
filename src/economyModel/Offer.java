@@ -4,21 +4,25 @@ import java.util.UUID;
 
 public class Offer {
 	
+	private UUID offerId; //identifier
 	private String offerType; //bid or ask
 	private String commodityType;
 	private UUID agentId; //either the seller or the buyer
 	private int quantity; //bid = amount offered; ask = amount desired
 	private int turnNumber; //keep track of when offer was made
-	private double offer;
+	private int offer;
 	private boolean offerAccepted;
+	private boolean partlyAccepted;
 	private String creatorAgentType;
 	
-	public Offer(UUID aId, String type, String commodity, int quant, double bid, int turnNo, String agentType) {
+	public Offer(UUID aId, String type, String commodity, int quant, int bid, int turnNo, String agentType) {
+		offerId = UUID.randomUUID();
 		offerType = type;
 		commodityType = commodity.toLowerCase();
 		quantity = quant;
 		offer = bid;
 		offerAccepted = false;
+		partlyAccepted = false;
 		agentId = aId;
 		turnNumber = turnNo;
 		creatorAgentType = agentType;
@@ -42,19 +46,28 @@ public class Offer {
 		return creatorAgentType;
 	}
 	
-	public double getOffer() {
+	public int getOffer() {
 		return offer;
 	}
 	
-	public UUID getId() {
+	public UUID getAgentId() {
 		return agentId;
 	}
 	
+	public UUID getId() {
+		return offerId;
+	}
+	
 	public void acceptOffer() {
+		partlyAccepted = false;
 		offerAccepted = true;
 	}
 	
-	public double getPricePerUnit() {
+	public void acceptPartialOffer() {
+		partlyAccepted = true;
+	}
+	
+	public int getPricePerUnit() {
 		return offer / quantity;
 	}
 	
@@ -67,12 +80,19 @@ public class Offer {
 		return offerAccepted;
 	}
 	
+	public boolean getOfferPartlyAccepted() {
+		return partlyAccepted;
+	}
+	
 	public String toString() {
 		StringBuffer s = new StringBuffer();
 		s.append("offerType: " + offerType);
 		s.append(", commodity: " + commodityType);
 		s.append(", quantity: " + quantity);
 		s.append(", price: " + offer);
+		s.append(", Id: " + offerId);
+		s.append(", accepted fully: " + offerAccepted);
+		s.append(", accepted partly: " + partlyAccepted);
 		s.append(", agentType: " + creatorAgentType);
 		s.append(", agentId: " + agentId + "\n");
 		

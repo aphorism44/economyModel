@@ -1,8 +1,5 @@
 package economyModel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -10,14 +7,23 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class Market {
 	
-	Clearinghouse house;
-	ArrayList<Agent> agents;
+	private Clearinghouse house;
+	private ArrayList<Agent> agents;
+	//eventually, create enums for commodities and define from imported data
+	private static ArrayList<String> tradeableCommodities = new ArrayList<String>() {{
+		add("food");
+		add("wood");
+		add("ore");
+		add("metal");
+		add("tools");
+	}};
 	
 	public Market(int agentMultiplier) {
 		agents = new ArrayList<Agent>();
@@ -41,7 +47,14 @@ public class Market {
 	}
 	
 	
-	
+	public void resolveOffers() {
+		
+		LinkedHashMap<UUID, Agent> agentMap = new LinkedHashMap<UUID, Agent>();
+		for (Agent a: agents)
+			agentMap.put(a.getUuid(), a);
+		for (String c: tradeableCommodities)
+			house.resolveOffers(c, agentMap);
+	}
 	
 	
 	
@@ -119,11 +132,18 @@ public class Market {
 	
 	
 	//using below for unit testing
+	public ArrayList<Agent> getAgents() {
+		return agents;
+	}
+	
 	public ArrayList<Offer> getBidBook() {
 		return house.getBidBook();
 	}
 	public ArrayList<Offer> getAskBook() {
 		return house.getAskBook();
+	}
+	public ArrayList<Offer> getHistoricalRecords() {
+		return house.getHistoricalRecords();
 	}
 	
 

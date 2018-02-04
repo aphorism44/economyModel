@@ -4,12 +4,12 @@ import java.util.Random;
 
 public class PriceBelief {
 	
-	private static final double initialLowePriceBound = 1;
-	private static final double initialHighPriceBound = 50;
+	private static final int initialLowePriceBound = 1;
+	private static final int initialHighPriceBound = 50;
 	
 	private String commodity;
-	private double lowerPriceBound;
-	private double upperPriceBound;
+	private int lowerPriceBound;
+	private int upperPriceBound;
 	
 	private static final double boundAdjustment = 0.05;
 	
@@ -19,7 +19,7 @@ public class PriceBelief {
 		upperPriceBound = initialHighPriceBound;
 	}
 	
-	public PriceBelief(String c, double low, double high) {
+	public PriceBelief(String c, int low, int high) {
 		commodity = c;
 		lowerPriceBound = low;
 		upperPriceBound = high;
@@ -38,17 +38,17 @@ public class PriceBelief {
 		return commodity;
 	}
 	
-	//return random number between the bounds; decided on 0.1 "steps" between the prices; may adjust this
-	public double getRandomBid() {
+	//return random number between the bounds; money must be round numbers
+	public int getRandomBid() {
 		Random r = new Random();
-	    return (r.nextInt((int)((upperPriceBound - lowerPriceBound) * 10 + 1)) + lowerPriceBound * 10) / 10.0;
+		return r.nextInt((upperPriceBound - lowerPriceBound) + 1) + lowerPriceBound;
 	}
 	
-	public double getLowerBound() {
+	public int getLowerBound() {
 		return lowerPriceBound;
 	}
 	
-	public double getUpperBound() {
+	public int getUpperBound() {
 		return upperPriceBound;
 	}
 	
@@ -62,8 +62,8 @@ public class PriceBelief {
 	
 	//below is run with unsuccessful offer; expends bounds around mean
 	public void expandBounds(Boolean lowInventory) {
-		double spread = upperPriceBound - lowerPriceBound;
-		double adjustment = spread * boundAdjustment;
+		int spread = upperPriceBound - lowerPriceBound;
+		int adjustment = (int)Math.round(spread * boundAdjustment);
 		if (lowInventory)
 			adjustment *= 5;
 		lowerPriceBound -= adjustment;
