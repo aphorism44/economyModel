@@ -9,15 +9,19 @@ import java.util.stream.Collectors;
 import java.util.OptionalDouble;
 
 public class Clearinghouse {
+	
+	private static final int defaultAveragePrice = 25;
+	private static final int defaultMaxPrice = 50;
+	private static final int defaultMinPrice = 50;
 
-	private ArrayList<Offer> historicalRecords;
+	private ArrayList<SaleRecord> historicalRecords;
 	private ArrayList<Offer> bidBook;
 	private ArrayList<Offer> askBook;
 	private int turnNumber;
 	
 	
 	public Clearinghouse() {
-		historicalRecords = new ArrayList<Offer>();
+		historicalRecords = new ArrayList<SaleRecord>();
 		bidBook = new ArrayList<Offer>();
 		askBook = new ArrayList<Offer>();
 		turnNumber = 1;
@@ -91,31 +95,42 @@ public class Clearinghouse {
 	}
 	
 	public int getHistoricalPriceMean(String c) {
-		//let's hear it for lambda!
+		
 		if (historicalRecords.size() > 0) {
-			ArrayList<Offer> commodityOffers = (ArrayList<Offer>)historicalRecords.stream().filter(o -> o.getCommodityType().equals(c)).collect(Collectors.toList());
-			OptionalDouble avg = commodityOffers.stream().mapToDouble(o->o.getPricePerUnit()).average();
-			if (avg.isPresent())
-				return (int)Math.round(avg.getAsDouble());
+			//let's hear it for lambda!
+			ArrayList<SaleRecord> commodityOffers = (ArrayList<SaleRecord>)historicalRecords.stream().filter(o -> o.getCommodityType().equals(c)).collect(Collectors.toList());
+			int q = 0, total = 0;
+			for (SaleRecord sr: commodityOffers) {
+				q += sr.getQuantity();
+				total += sr.getOffer();
+			}
+			
+			
+			return q > 0 ? Math.round(total / q) : defaultAveragePrice;
 		}
 		//returns below when there's no returned bids yet
-		return 0;
+		return defaultAveragePrice;
 	}
 	
 	public int getHistoricalMaxPrice(String c) {
 		if (historicalRecords.size() > 0) {
-			ArrayList<Offer> commodityOffers = (ArrayList<Offer>) historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
-			for (Offer o: commodityOffers)
-				System.out.println(o.toString());
+			ArrayList<SaleRecord> commodityOffers = (ArrayList<SaleRecord>) historicalRecords.stream().filter(o->o.getCommodityType().equals(c));
+			int max = 0;
+			for (SaleRecord sr: commodityOffers)
+				max = Math.max(max, sr.getOffer());
 			
-			OptionalDouble max = commodityOffers.stream().mapToDouble(o -> o.getPricePerUnit()).max();
-			if (max.isPresent())
-				return (int)Math.round(max.getAsDouble());
+			return max > 0 ? max : defaultMaxPrice;
 		}
 		//returns below when there's no returned bids yet
-		return 0;
+		return defaultMaxPrice;
 	}
 	
+	
+	public void offerRound(LinkedHashMap<UUID, Agent> agents, ArrayList<String> commodities) {
+		for (String c: commodities)
+			resolveOffers(c, agents);
+		turnNumber++;
+	}
 	
 	public void resolveOffers(String commodity, LinkedHashMap<UUID, Agent> agents ) {
 		
@@ -159,11 +174,13 @@ public class Clearinghouse {
 				bid.updateQuantity(-tradeQuantity);
 				ask.updateQuantity(-tradeQuantity);
 				
+				//make sure to positively update price belief on sales
 				if (bid.getQuantity() < 1) {
 					bid.acceptOffer();
 					buyer.updatePriceBelief(bid, 0);
 					removeFromBidBook(bid.getId());
-					historicalRecords.add(bids.remove(0));
+					Offer finishedBid = bids.remove(0);
+					historicalRecords.add(new SaleRecord(finishedBid.getOfferType(), finishedBid.getCommodityType(), tradeQuantity, finishedBid.getOffer(), finishedBid.getTurnNumber(), seller.getAgentType(), buyer.getAgentType()   ));
 				} else {
 					bid.acceptPartialOffer();
 				}
@@ -172,7 +189,8 @@ public class Clearinghouse {
 					ask.acceptOffer();
 					seller.updatePriceBelief(ask, 0);
 					removeFromAskBook(ask.getId());
-					historicalRecords.add(asks.remove(0));
+					Offer finishedAsk = asks.remove(0);
+					historicalRecords.add(new SaleRecord(finishedAsk.getOfferType(), finishedAsk.getCommodityType(), tradeQuantity, finishedAsk.getOffer(), finishedAsk.getTurnNumber(), seller.getAgentType(), buyer.getAgentType() ));
 				} else {
 					ask.acceptPartialOffer();
 				}
@@ -196,8 +214,6 @@ public class Clearinghouse {
 			ab.updatePriceBelief(ask, mean);
 		}
 		
-		
-		turnNumber++;
 	}
 	
 	public ArrayList<Offer> getBidBook() {
@@ -206,7 +222,7 @@ public class Clearinghouse {
 	public ArrayList<Offer> getAskBook() {
 		return askBook;
 	}
-	public ArrayList<Offer> getHistoricalRecords() {
+	public ArrayList<SaleRecord> getHistoricalRecords() {
 		return historicalRecords;
 	}
 	public void removeFromBidBook(UUID id) {
@@ -230,6 +246,10 @@ public class Clearinghouse {
 		    	break;
 		    }
 		}
+	}
+	
+	public int getTurnNumber() {
+		return turnNumber;
 	}
 	
 

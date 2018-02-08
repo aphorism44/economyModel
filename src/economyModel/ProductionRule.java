@@ -95,11 +95,11 @@ public class ProductionRule {
 	public String toString() {
 		StringBuffer sOut = new StringBuffer();
 		sOut.append("ProductionRule object: ");
-		sOut.append("agentType: " + agentType + ", ");
+		sOut.append(", agentType: " + agentType + ", ");
 		sOut.append("commodity: " + commodity + ", ");
 		sOut.append("productionType: " + productionType + ", ");
 		sOut.append("produceAction: " + produceAction + ", ");
-		sOut.append("quantity: " + quantity);
+		sOut.append("quantity: " + quantity + ",");
 		if (matchedCommodity != null)
 			sOut.append(", matchedCommodity: " + matchedCommodity);
 		

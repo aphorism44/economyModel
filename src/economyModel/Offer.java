@@ -90,10 +90,15 @@ public class Offer {
 	public boolean getOfferPartlyAccepted() {
 		return partlyAccepted;
 	}
+
+	public int getTurnNumber() {
+		return turnNumber;
+	}
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();
 		s.append("offerType: " + offerType);
+		s.append(", turn: " + turnNumber);
 		s.append(", commodity: " + commodityType);
 		s.append(", quantity: " + quantity);
 		s.append(", price: " + offer);

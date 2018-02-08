@@ -16,6 +16,8 @@ public class Market {
 	
 	private Clearinghouse house;
 	private ArrayList<Agent> agents;
+	private ArrayList<Agent> agentTemplates; //these are imported data; user can add to agents as needed
+	
 	//eventually, create enums for commodities and define from imported data
 	private static ArrayList<String> tradeableCommodities = new ArrayList<String>() {{
 		add("food");
@@ -25,10 +27,32 @@ public class Market {
 		add("tools");
 	}};
 	
-	public Market(int agentMultiplier) {
+	public Market() {
+		agentTemplates = new ArrayList<Agent>();
 		agents = new ArrayList<Agent>();
 		house = new Clearinghouse();
-		createAgents(agentMultiplier);
+		loadAgentTemplates();
+	}
+	
+	public void addAgent(String agentType, int n) {
+		for (Agent a: agentTemplates) {
+			if (a.getAgentType().equals(agentType)) {
+				for (int i = 0; i < n; i++) {
+					Agent newA = new Agent(a);
+					agents.add(newA);
+				}
+				break;
+			}
+		}
+	}
+	
+	public void iterateTurn(int n) {
+		for (int i = 0; i < n; i++) {
+			agentsProduce();
+			agentsCreateOffers();
+			resolveOffers();
+			removeBrokeAgents();
+		}
 	}
 	
 	
@@ -52,13 +76,23 @@ public class Market {
 		LinkedHashMap<UUID, Agent> agentMap = new LinkedHashMap<UUID, Agent>();
 		for (Agent a: agents)
 			agentMap.put(a.getUuid(), a);
-		for (String c: tradeableCommodities)
-			house.resolveOffers(c, agentMap);
+		house.offerRound(agentMap, tradeableCommodities);
+	}
+	
+	public boolean removeBrokeAgents() {
+		Iterator agentIt = agents.iterator();
+		while (agentIt.hasNext()) {
+			Agent a = (Agent)agentIt.next();
+			if (a.getMoney() < 1)
+				agentIt.remove();
+		}
+		
+		
+		return agents.size() > 0;
 	}
 	
 	
-	
-	public void createAgents(int n) {
+	public void loadAgentTemplates() {
 		
 		String txtFileName = "C:\\Users\\Jesse\\eclipse-workspace\\economyModel\\src\\productionData.csv";
 		boolean fileOpened = false; 
@@ -121,13 +155,11 @@ public class Market {
 	        behaviors.add(rb);
 	    }
 		
-	    //finally, add the production behaviors into agents
-	    for (int i = 0; i < n; i++) {
-	    	for (ProductionBehavior pb: behaviors) {
-		    	Agent a = new Agent(pb.getAgentType(), pb);
-		    	agents.add(a);	
-		    }
-	    }   
+	    //finally, add the production behaviors into agent templates
+    	for (ProductionBehavior pb: behaviors) {
+	    	Agent a = new Agent(pb.getAgentType(), pb);
+	    	agentTemplates.add(a);	
+	    }
 	}
 	
 	
@@ -142,8 +174,22 @@ public class Market {
 	public ArrayList<Offer> getAskBook() {
 		return house.getAskBook();
 	}
-	public ArrayList<Offer> getHistoricalRecords() {
+	public ArrayList<SaleRecord> getHistoricalRecords() {
 		return house.getHistoricalRecords();
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Market status:\n");
+		sb.append("Turn number: " + house.getTurnNumber() + "\n");
+		sb.append("Active agents:" + agents.size() + "\n");
+		sb.append("Average prices:\n");
+		for (String comm: tradeableCommodities) {
+			sb.append(comm + ": " + house.getHistoricalPriceMean(comm) + "\n");
+		}
+		
+		return sb.toString();
 	}
 	
 

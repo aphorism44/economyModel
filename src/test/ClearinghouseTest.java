@@ -14,11 +14,20 @@ public class ClearinghouseTest {
 	@Test
 	public void createMarket() {
 
-		Market m = new Market(1);
+		Market m = new Market();
 		
-		assertEquals(m.getAgentCount() , 5);
+		assertEquals(m.getAgentCount() , 0);
+		
+		m.addAgent("farmer", 3);
+		m.addAgent("blacksmith", 1);
+		m.addAgent("refiner", 1);
+		m.addAgent("miner", 1);
+		m.addAgent("lumberjack", 1);
+		
+		assertEquals(m.getAgentCount() , 7);
 		
 		m.agentsProduce();
+		
 		
 		/*
 		System.out.println("after production agents");
@@ -108,28 +117,41 @@ public class ClearinghouseTest {
 		
 		assertEquals(m.getHistoricalRecords().size(), 0);
 		
-		//unit testing of offer resolution
-		//System.out.println("initial bids:" + m.getBidBook().size());
-		//System.out.println("initial asks:" + m.getAskBook().size());
-		int allOffers = m.getBidBook().size() + m.getAskBook().size();
-		//System.out.println("allOffers " + allOffers);
+		
 		m.resolveOffers();
 		
-		assert(allOffers == (m.getHistoricalRecords().size() +  m.getBidBook().size() + m.getAskBook().size()));
-		
+		//check offer resolution
 		/*
+		System.out.println("initial bids:" + m.getBidBook().size());
+		System.out.println("initial asks:" + m.getAskBook().size());
+		int allOffers = m.getBidBook().size() + m.getAskBook().size();
+		System.out.println("allOffers " + allOffers);
+		
+		
+		assert(allOffers == (m.getBidBook().size() + m.getAskBook().size()));
+		
+		
 		System.out.println("completed offer resolution");
 		System.out.println("filled " + m.getHistoricalRecords().size());
-		System.out.println("unfilled bids " + m.getBidBook().size());
-		System.out.println("unfilled asks " + m.getAskBook().size());
-		
-		for (Offer o: m.getHistoricalRecords())
+		for (SaleRecord o: m.getHistoricalRecords())
 			System.out.println(o.toString());
+		
+		System.out.println("unfilled bids " + m.getBidBook().size());
+		for (Offer o: m.getBidBook())
+			System.out.println(o.toString());
+		
+		System.out.println("unfilled asks " + m.getAskBook().size());
+		for (Offer o: m.getAskBook())
+			System.out.println(o.toString());
+		
+		
+		//make sure price beliefs correspond with offer resolutions
+		System.out.println("final agent price beliefs");
+		for (Agent a: m.getAgents())
+			System.out.println(a.getPriceBeliefString());
 		*/
 		
-		System.out.println("final agents");
-		for (Agent a: m.getAgents())
-			System.out.println(a.toString());
+		
 		
 		
 	}

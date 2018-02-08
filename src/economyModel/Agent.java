@@ -1,7 +1,11 @@
 package economyModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 public class Agent {
@@ -10,6 +14,7 @@ public class Agent {
 	private static final int inventorySize = 15;
 	private static final int startingGoods = 8;
 	private static final double replenishThreshold = 0.2;
+	private static final double productionThreshold = 0.667;
 	
 	private String agentType;
 	UUID id;
@@ -52,19 +57,65 @@ public class Agent {
 		
 	}
 	
-	public void produce() {
-		inventory = productionBehavior.produce(inventory);
-		//handle fines
-		if (inventory.containsKey("fine")) {
-			money -= inventory.get("fine");
-			inventory.remove("fine");
+	//copy constructor
+	public Agent(Agent a) {
+		agentType = a.getAgentType();
+		productionBehavior = a.getProductionBehavior();
+		inventory = new LinkedHashMap<String, Integer>();
+		money = startingMoney;
+		id = UUID.randomUUID();
+		priceBeliefs = new LinkedHashMap<String, PriceBelief>();
+		consumedItems = a.getProductionBehavior().getConsumedCommodities();
+		producedItems = a.getProductionBehavior().getProducedCommodities();
+		usesTools = a.getProductionBehavior().getUsesTools();
+		//initial inventories and price beliefs
+		for (String i: consumedItems) {
+			inventory.put(i, startingGoods);
+			PriceBelief consB = new PriceBelief(i);
+			priceBeliefs.put(i, consB);
 		}
 		
-		//make sure inventory doesn't exceed max spaces
-		inventory.forEach((key, value) -> {
-			if (value > inventorySize)
-				value = inventorySize;
-		});
+		for (String i: producedItems) {
+			inventory.put(i, 0);
+			PriceBelief prodB = new PriceBelief(i);
+			priceBeliefs.put(i, prodB);
+		}
+		if (productionBehavior.getUsesTools()) {
+			inventory.put("tools", 1);
+			PriceBelief toolB = new PriceBelief("tools");
+			priceBeliefs.put("tools", toolB);
+		}
+	}
+	
+	public void produce() {
+		if (needsToProduce()) {
+			inventory = productionBehavior.produce(inventory);
+			//handle fines
+			if (inventory.containsKey("fine")) {
+				money -= inventory.get("fine");
+				inventory.remove("fine");
+			}
+			
+			//make sure inventory doesn't exceed max spaces
+			inventory.forEach((key, value) -> {
+				if (value > inventorySize)
+					value = inventorySize;
+			});
+		}
+	}
+	
+	public boolean needsToProduce() {
+		//don't produce if your produced goods are near full capacity
+		boolean needsProduction = true;
+		Iterator invIt = inventory.entrySet().iterator();
+		while (invIt.hasNext()) {
+			Map.Entry<String, Integer> pair = (Entry<String, Integer>) invIt.next();
+			if (producedItems.contains(pair.getKey()) && pair.getValue() > (inventorySize * productionThreshold)  ) {
+				needsProduction = false;
+				break;
+			}
+		}
+		return needsProduction;
 	}
 	
 	public UUID getUuid() {
@@ -181,15 +232,37 @@ public class Agent {
 		return inventorySize;
 	}
 	
+	public ProductionBehavior getProductionBehavior() {
+		return productionBehavior;
+	}
+	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(productionBehavior.toString());
-		sb.append(", money:" + money);
-		sb.append(", inventory:");
+		sb.append("agentType: " + agentType + ",");
+		sb.append("money:" + money + ",");
+		sb.append("inventory:");
 		inventory.forEach((key, value) -> {
 			sb.append(key + ":" + value + " ");
 		});
 		
+		return sb.toString();
+	}
+	
+	public String getPriceBeliefString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("for agent " + agentType + "\n");
+		Iterator beliefIt = priceBeliefs.entrySet().iterator();
+		while (beliefIt.hasNext()) {
+			Map.Entry<String, PriceBelief> pair = (Entry<String, PriceBelief>) beliefIt.next();
+			sb.append(pair.getValue().toString());
+		}
+		return sb.toString();
+	}
+	
+	public String getProductionRulesString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("agentType: " + agentType + ",");
+		sb.append(productionBehavior.toString());
 		return sb.toString();
 	}
 	

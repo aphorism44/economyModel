@@ -74,8 +74,16 @@ public class PriceBelief {
 
 		lowerPriceBound -= adjustment;
 		upperPriceBound += adjustment;
+		//prevent negative price bounds
+		lowerPriceBound = Math.max(lowerPriceBound, 1);
 				
 	}
 	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Price belief for: " + commodity + ", ");
+		sb.append("lower: " + lowerPriceBound + ", upper: " + upperPriceBound + "\n");
+		return sb.toString();
+	}
 	
 }
