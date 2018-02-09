@@ -1,4 +1,4 @@
-package economyModel;
+package main.java;
 
 public class SaleRecord {
 	
@@ -44,7 +44,7 @@ public class SaleRecord {
 		s.append(", turn: " + turnNumber);
 		s.append(", commodity: " + commodityType);
 		s.append(", quantity: " + quantity);
-		s.append(", price: " + offer + "\n");
+		s.append(", price: " + offer);
 		
 		return s.toString();
 	}

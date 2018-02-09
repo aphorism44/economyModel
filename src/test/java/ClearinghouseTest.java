@@ -1,6 +1,7 @@
-package test;
+package test.java;
 
-import economyModel.*;
+import main.java.Market;
+import main.java.Offer;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +11,7 @@ import org.junit.Test;
 import org.junit.Assert;
 
 public class ClearinghouseTest {
-
+	
 	@Test
 	public void createMarket() {
 

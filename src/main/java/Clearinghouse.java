@@ -1,4 +1,4 @@
-package economyModel;
+package main.java;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,7 +124,6 @@ public class Clearinghouse {
 		//returns below when there's no returned bids yet
 		return defaultMaxPrice;
 	}
-	
 	
 	public void offerRound(LinkedHashMap<UUID, Agent> agents, ArrayList<String> commodities) {
 		for (String c: commodities)

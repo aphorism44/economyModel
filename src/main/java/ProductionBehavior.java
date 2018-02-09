@@ -1,11 +1,11 @@
-package economyModel;
+package main.java;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
-import enums.ProductionAction;
-import enums.ProductionRuleType;
+import main.java.enums.ProductionAction;
+import main.java.enums.ProductionRuleType;
 
 public class ProductionBehavior {
 	
@@ -194,6 +194,10 @@ public class ProductionBehavior {
 	
 	public boolean getUsesTools() {
 		return usesTools;
+	}
+	
+	public int getFine() {
+		return fine;
 	}
 	
 	//for testing

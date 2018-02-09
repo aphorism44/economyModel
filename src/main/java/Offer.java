@@ -1,4 +1,4 @@
-package economyModel;
+package main.java;
 
 import java.util.UUID;
 

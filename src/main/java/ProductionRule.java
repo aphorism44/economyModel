@@ -1,7 +1,7 @@
-package economyModel;
+package main.java;
 
-import enums.ProductionAction;
-import enums.ProductionRuleType;
+import main.java.enums.ProductionAction;
+import main.java.enums.ProductionRuleType;
 
 public class ProductionRule {
 	

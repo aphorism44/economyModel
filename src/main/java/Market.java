@@ -1,4 +1,4 @@
-package economyModel;
+package main.java;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +17,9 @@ public class Market {
 	private Clearinghouse house;
 	private ArrayList<Agent> agents;
 	private ArrayList<Agent> agentTemplates; //these are imported data; user can add to agents as needed
+	private static final int defaultAveragePrice = 25;
+	
+	private static String agentDataCsvFileName = "src/main/resources/productionData.csv";
 	
 	//eventually, create enums for commodities and define from imported data
 	private static ArrayList<String> tradeableCommodities = new ArrayList<String>() {{
@@ -91,10 +94,28 @@ public class Market {
 		return agents.size() > 0;
 	}
 	
+	//the TRUE market value should be the average of what agents are willing to pay for it
+	public int getAveragePriceBelief(String c) {
+		int totalCost = 0, noAgent = 0;
+		
+		
+		return noAgent > 0 ? Math.round(totalCost / noAgent) : defaultAveragePrice;
+	}
+	
+	//if no agents have the commodity, we can't give a true market value
+	public boolean isCommodityAvailable(String c) {
+		for (Agent a: agents) {
+			if (a.getInventoryCount(c) > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	public void loadAgentTemplates() {
 		
-		String txtFileName = "C:\\Users\\Jesse\\eclipse-workspace\\economyModel\\src\\productionData.csv";
+		String txtFileName = agentDataCsvFileName;
 		boolean fileOpened = false; 
 		ArrayList<String> csvLines = null;
 		//below are the rules to be turned into behaviors, then agents

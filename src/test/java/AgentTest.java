@@ -1,20 +1,26 @@
-package test;
+package test.java;
 
-import economyModel.*;
+import main.java.Agent;
+import main.java.ProductionBehavior;
+import main.java.ProductionRule;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 public class AgentTest {
 
@@ -22,7 +28,7 @@ public class AgentTest {
 	@Test
 	public void CreateAgents() {
 		
-		String txtFileName = "C:\\Users\\Jesse\\eclipse-workspace\\economyModel\\src\\productionData.csv";
+		String txtFileName = "src/main/resources/productionData.csv";
 		boolean fileOpened = false; 
 		ArrayList<String> csvLines = null;
 		//below are the rules to be turned into behaviors, then agents
@@ -33,6 +39,8 @@ public class AgentTest {
 		//the agents
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		
+		File file;
+		Scanner csvFile;
 		
 		//using Java 8 streams
 		try (Stream<String> stream = Files.lines(Paths.get(txtFileName))) {
