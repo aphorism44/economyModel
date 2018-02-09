@@ -11,7 +11,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class Market {
 	
 	private Clearinghouse house;
@@ -37,16 +39,17 @@ public class Market {
 		loadAgentTemplates();
 	}
 	
-	public void addAgent(String agentType, int n) {
+	public boolean addAgent(String agentType, int n) {
 		for (Agent a: agentTemplates) {
 			if (a.getAgentType().equals(agentType)) {
 				for (int i = 0; i < n; i++) {
 					Agent newA = new Agent(a);
 					agents.add(newA);
 				}
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	public void iterateTurn(int n) {

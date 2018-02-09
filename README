@@ -1,3 +1,36 @@
-This is in progress, a model economy based on this paper:
+This REST API controls a model economy based on this paper:
 
 https://larc.unt.edu/techreports/LARC-2010-03.pdf
+
+The initial setup for the agents is configurable in the following file:
+
+/src/main/resources/productionData.csv
+
+One instance of the "market" is instantiated within Spring Boot.
+
+Adds an agent of the type named by the string. There are currently five different agents types defined:
+
+1. "farmer" (produces food)
+2. "lumberjack" (produces wood)
+3. "miner" (produces ore)
+4. "refiner" (changes ore to metal)
+5. "blacksmith" (changes metal to tools)
+
+All of the agents consume food on a daily basis (with the exception of the farmer, which consumes wood).
+
+All of the agents must have 1 tool in inventory to produce at top capacity (with the exception of the blacksmith, which produces tools).
+
+
+The REST API has 3 endpoints:
+
+"/status"
+
+Outputs the status of the market at this particular iteration/turn. Currently the turn number, number of agents, and average prices.
+
+"/add?agentType=s"
+
+Adds 1 agent of the type specified by the string s (one of the 5 above choices, or it will return an error message).
+
+"/iterate?turns=n"
+
+Iterates the market by n "turns."
