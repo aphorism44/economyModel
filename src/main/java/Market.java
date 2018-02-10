@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -97,15 +99,29 @@ public class Market {
 		return agents.size() > 0;
 	}
 	
+	public LinkedHashMap getMarketPrices() {
+		LinkedHashMap<String, Integer> marketP = new LinkedHashMap<String, Integer>();
+		for (String comm: tradeableCommodities)
+			marketP.put(comm, getMarketPrice(comm));
+		
+		return marketP;
+	}
+	
 	//the TRUE market value should be the average of what agents are willing to pay for it
-	public int getAveragePriceBelief(String c) {
+	public int getMarketPrice(String comm) {
 		int totalCost = 0, noAgent = 0;
 		
+		for (Agent a: agents) {
+			int price = a.getPriceBelief(comm);
+			if (price > 0) {
+				noAgent++;
+				totalCost += price;
+			}
+		}
 		
 		return noAgent > 0 ? Math.round(totalCost / noAgent) : defaultAveragePrice;
 	}
 	
-	//if no agents have the commodity, we can't give a true market value
 	public boolean isCommodityAvailable(String c) {
 		for (Agent a: agents) {
 			if (a.getInventoryCount(c) > 0) {
@@ -202,19 +218,32 @@ public class Market {
 		return house.getHistoricalRecords();
 	}
 	
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
+	public LinkedHashMap getStatus() {
+		LinkedHashMap<String, Integer> status = new LinkedHashMap<String, Integer>();
+		LinkedHashMap<String, Integer> agentCounts = getAgentTypeCounts();
 		
-		sb.append("Market status:\n");
-		sb.append("Turn number: " + house.getTurnNumber() + "\n");
-		sb.append("Active agents:" + agents.size() + "\n");
-		sb.append("Average prices:\n");
-		for (String comm: tradeableCommodities) {
-			sb.append(comm + ": " + house.getHistoricalPriceMean(comm) + "\n");
-		}
+		status.put("turnNumber", house.getTurnNumber());
+		status.put("totalAgents", agents.size());
 		
-		return sb.toString();
+		for (Map.Entry<String, Integer> pair : agentCounts.entrySet())
+		    status.put(pair.getKey(), pair.getValue());
+		
+		return status;
 	}
+	
+	public LinkedHashMap getAgentTypeCounts() {
+		LinkedHashMap<String, Integer> counts = new LinkedHashMap<String, Integer>();
+		for (Agent a: agents)
+			if (counts.containsKey(a.getAgentType())) {
+				counts.put(a.getAgentType(), counts.get(a.getAgentType()) + 1 );
+			} else {
+				counts.put(a.getAgentType(), 1);
+			}
+				
+		
+		return counts;
+	}
+	
 	
 
 }

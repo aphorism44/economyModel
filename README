@@ -6,9 +6,9 @@ The initial setup for the agents is configurable in the following file:
 
 /src/main/resources/productionData.csv
 
-One instance of the "market" is instantiated within Spring Boot.
+One instance of the "Market" Bean is instantiated within Spring Boot.
 
-Adds an agent of the type named by the string. There are currently five different agents types defined:
+There are currently five different agents types defined:
 
 1. "farmer" (produces food)
 2. "lumberjack" (produces wood)
@@ -21,16 +21,55 @@ All of the agents consume food on a daily basis (with the exception of the farme
 All of the agents must have 1 tool in inventory to produce at top capacity (with the exception of the blacksmith, which produces tools).
 
 
-The REST API has 3 endpoints:
+The REST API has 4 endpoints:
 
 "/status"
 
-Outputs the status of the market at this particular iteration/turn. Currently the turn number, number of agents, and average prices.
+Outputs the status of the market at this particular iteration/turn. Currently the turn number, number of agents, and breakdown of agents by type.
+
+EXAMPLE OUTPUT:
+
+{ turnNumber: 151,
+totalAgents: 4,
+farmer: 1,
+lumberjack: 1,
+miner: 1,
+blacksmith: 1 }
+
+
+
+"/prices?commodity=string"
+
+Output the names and market value of the parameter commodity; if send without any commodity, it will output for all commodities.
+
+EXAMPLE OUTPUTS:
+
+{ food: 20,
+wood: 13,
+ore: 13,
+metal: 37,
+tools: 41 }
+
+{ food: "35" }
+
+
 
 "/add?agentType=s"
 
 Adds 1 agent of the type specified by the string s (one of the 5 above choices, or it will return an error message).
 
+EXAMPLE OUTPUTS:
+
+{ response: "added 1 agent of type farmer" }
+
+{ response: "there is no agent template for type toymaker" }
+
+
+
 "/iterate?turns=n"
 
 Iterates the market by n "turns."
+
+EXAMPLE OUTPUT:
+
+{ response: "iterated 5 turns" }
