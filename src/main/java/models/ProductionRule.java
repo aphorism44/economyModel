@@ -1,4 +1,4 @@
-package main.java;
+package main.java.models;
 
 import main.java.enums.ProductionAction;
 import main.java.enums.ProductionRuleType;

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import main.java.Agent;
-import main.java.Market;
-import main.java.SaleRecord;
+import main.java.models.Agent;
+import main.java.models.Market;
+import main.java.models.SaleRecord;
 
 public class LoopTest {
 	

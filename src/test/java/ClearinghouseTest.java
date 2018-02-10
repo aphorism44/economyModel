@@ -1,13 +1,14 @@
 package test.java;
 
-import main.java.Market;
-import main.java.Offer;
-
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
+
+import main.java.models.Market;
+import main.java.models.Offer;
+
 import org.junit.Assert;
 
 public class ClearinghouseTest {

@@ -1,9 +1,5 @@
 package test.java;
 
-import main.java.Agent;
-import main.java.ProductionBehavior;
-import main.java.ProductionRule;
-
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -21,6 +17,10 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+
+import main.java.models.Agent;
+import main.java.models.ProductionBehavior;
+import main.java.models.ProductionRule;
 
 public class AgentTest {
 

@@ -1,4 +1,4 @@
-package main.java;
+package main.java.controllers;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import main.java.models.Market;
 
 @RestController
 public class MarketController {
@@ -51,15 +53,12 @@ public class MarketController {
 		return convertToLinkedHashMap("response", "iterated " + n + " turns");
 	}
 	
+	
 	public LinkedHashMap convertToLinkedHashMap(String a, String b) {
 		LinkedHashMap<String, String> response = new LinkedHashMap<String, String>();
 		response.put(a, b);
 		return response;
 	}
 	
-	@ExceptionHandler
-	void handleIllegalArgumentException(IllegalArgumentException e, HttpServletResponse response) throws IOException {
-	    response.sendError(HttpStatus.BAD_REQUEST.value());
-	}
 
 }

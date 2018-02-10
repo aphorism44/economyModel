@@ -1,10 +1,17 @@
+This is a Maven Spring Boot project, initially created as an Eclipse "Java Project," then converted to an Eclipse "Maven project." The POM file is at root level.
+
+MAIN CLASS: src/main/java/Main.java (you can run this as a Java app in Eclipse)
+CONTROLLER CLASS: src/main/java/controllers/MarketController.java
+INSTANTIATED BEAN: src/main/java/models/Market.java
+
 This REST API controls a model economy based on this paper:
 
 https://larc.unt.edu/techreports/LARC-2010-03.pdf
 
-The initial setup for the agents is configurable in the following file:
+A full explanation of this model, and how it was designed, is available in this blog entry:
 
-/src/main/resources/productionData.csv
+https://wordpress.com/post/aphorism44.wordpress.com/609
+
 
 One instance of the "Market" Bean is instantiated within Spring Boot.
 
@@ -20,8 +27,13 @@ All of the agents consume food on a daily basis (with the exception of the farme
 
 All of the agents must have 1 tool in inventory to produce at top capacity (with the exception of the blacksmith, which produces tools).
 
+The initial setup for the agent Production Rules is configurable with the following file:
 
-The REST API has 4 endpoints:
+/src/main/resources/productionData.csv
+
+The REST API has 4 resources:
+
+1. GET STATUS
 
 "/status"
 
@@ -37,6 +49,7 @@ miner: 1,
 blacksmith: 1 }
 
 
+2. GET PRICES
 
 "/prices?commodity=string"
 
@@ -52,7 +65,7 @@ tools: 41 }
 
 { food: "35" }
 
-
+3. ADD AGENT TYPES
 
 "/add?agentType=s"
 
@@ -64,7 +77,7 @@ EXAMPLE OUTPUTS:
 
 { response: "there is no agent template for type toymaker" }
 
-
+4. ITERATE TURNS
 
 "/iterate?turns=n"
 
